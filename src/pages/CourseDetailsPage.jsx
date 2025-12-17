@@ -79,7 +79,7 @@ const CourseDetailsPage = () => {
     return (
         <div className="pt-20 bg-white">
             {/* Hero Section */}
-            <section className="relative pt-32 pb-24 overflow-hidden min-h-[50vh]"
+            <section className="relative pt-32 pb-24 overflow-hidden min-h-[50vh] mb-6"
                 style={{
                     backgroundImage: `url(${slider_khac})`,
                     backgroundSize: 'cover',
@@ -155,7 +155,7 @@ const CourseDetailsPage = () => {
                         </div>
 
                         {/* CTA Button */}
-                        <div className="text-center">
+                        <div className="text-center mb-6">
                             <a href="#contact" className="inline-block bg-primary hover:bg-primary-dark text-white font-bold py-4 px-12 rounded-full shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 text-lg uppercase tracking-wide">
                                 Học phí: Liên hệ
                             </a>
