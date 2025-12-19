@@ -63,10 +63,10 @@ const AdminDashboard = () => {
                                     <div className="w-2 h-2 rounded-full bg-blue-500"></div>
                                     <div className="flex-1">
                                         <p className="text-sm text-gray-600">
-                                            <span className="font-bold text-gray-800">{lead.full_name}</span> - {lead.phone_number}
+                                            <span className="font-bold text-gray-800">{lead.name}</span> - {lead.phone}
                                         </p>
                                         <p className="text-xs text-gray-400 truncate w-64">
-                                            {lead.goal && Array.isArray(lead.goal) ? lead.goal.join(', ') : ''}
+                                            {lead.goals && Array.isArray(lead.goals) ? lead.goals.join(', ') : ''}
                                         </p>
                                     </div>
                                     <span className="ml-auto text-xs text-gray-400">

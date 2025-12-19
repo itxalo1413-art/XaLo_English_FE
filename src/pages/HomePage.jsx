@@ -91,7 +91,7 @@ const HomePage = () => {
             </div>
           </div>
           <div className="relative h-[400px] w-full rounded-2xl overflow-hidden shadow-xl">
-            <img src="carousel.png" alt="Xalo English Student" className="w-full h-full object-cover" />
+            <img src={"carousel.png" || "https://placehold.co/800x600?text=Carousel"} alt="Xalo English Student" className="w-full h-full object-cover" />
           </div>
         </div>
       </section>
@@ -123,7 +123,7 @@ const HomePage = () => {
                 </p>
               </div>
               <div className="md:w-1/2 relative min-h-[300px]">
-                <iframe width="100%" height="100%" src="https://www.youtube.com/embed/ZsJGAdcC-5U" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+                <iframe width="100%" height="100%" src="https://www.youtube.com/embed/ZsJGAdcC-5U" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
                 <div className="absolute inset-0 flex items-center justify-center bg-black/20 group cursor-pointer hover:bg-black/30 transition-all">
                   <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center text-white shadow-xl group-hover:scale-110 transition-transform">
                     <svg className="w-8 h-8 fill-current" viewBox="0 0 24 24">
