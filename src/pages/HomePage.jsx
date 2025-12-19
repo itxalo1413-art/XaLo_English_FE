@@ -55,9 +55,9 @@ const HomePage = () => {
     <div className="pt-20">
       <HomePopup />
       {/* Hero Section */}
-      <section className="relative min-h-[600px] lg:h-[600px] h-auto flex items-center text-white overflow-hidden py-12 lg:py-0">
+      <section className="relative min-h-[600px] h-auto flex items-center text-white overflow-hidden py-12">
         <div className="absolute -top-[20%] -right-[10%] w-[60%] h-[120%] bg-gradient-to-br from-primary-light to-primary-dark rounded-l-full opacity-10 z-0"></div>
-        <div className="container mx-auto px-4 relative z-10 grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-12 items-center">
+        <div className="container mx-auto px-4 md:px-8 xl:px-24 2xl:px-32 relative z-10 grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-12 items-center">
           <div className="animate-fade-in">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 text-text-primary leading-tight">
               Chinh Phục Tiếng Anh <br />
@@ -97,7 +97,10 @@ const HomePage = () => {
       </section>
 
       {/* Courses Categories Section */}
+      <div className='max-w-5xl mx-auto'>
+
       <CourseCategories />
+      </div>
 
       {/* Features Section */}
       <Section className="py-24 bg-gray-50">

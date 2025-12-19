@@ -13,10 +13,15 @@ import result7 from '../../assets/results/result7.jpg';
 const results = [result1, result2, result3, result4, result5, result6, result7];
 
 const CourseCategories = () => {
+    // Extend results for continuous loop (3 sets: prev, current, next)
+    const extendedResults = [...results, ...results, ...results];
+
+    // Start at the beginning of the middle set
+    const [activeResultIndex, setActiveResultIndex] = useState(results.length);
+    const [isTransitioning, setIsTransitioning] = useState(true);
     const [programGroups, setProgramGroups] = useState([]);
     const [activeTab, setActiveTab] = useState(null);
     const [activeSubTab, setActiveSubTab] = useState(null);
-    const [activeResultIndex, setActiveResultIndex] = useState(0);
     const [loading, setLoading] = useState(true);
 
 
@@ -58,13 +63,38 @@ const CourseCategories = () => {
         }
     }, [activeTab, currentGroup]);
 
+    // Auto-play effect
     useEffect(() => {
         const interval = setInterval(() => {
-            setActiveResultIndex((prev) => (prev === results.length - 1 ? 0 : prev + 1));
-        }, 2000);
+            setActiveResultIndex((prev) => prev + 1);
+        }, 3000); // 3 seconds for better UX
 
         return () => clearInterval(interval);
     }, []);
+
+    // Handle seamless loop snapping
+    useEffect(() => {
+        if (activeResultIndex >= results.length * 2) {
+            // Reached the start of the 3rd set (clone of 1st set)
+            // Wait for transition to finish, then snap back to middle set
+            const timer = setTimeout(() => {
+                setIsTransitioning(false);
+                setActiveResultIndex(results.length);
+                // Force a small delay before re-enabling transition to ensure render happens
+                setTimeout(() => setIsTransitioning(true), 50);
+            }, 500); // Match CSS duration
+            return () => clearTimeout(timer);
+        } else if (activeResultIndex < results.length) {
+            // Reached the end of the 1st set (clone of last set)
+            // Snap forward to middle set
+            const timer = setTimeout(() => {
+                setIsTransitioning(false);
+                setActiveResultIndex(results.length * 2 - 1);
+                setTimeout(() => setIsTransitioning(true), 50);
+            }, 500);
+            return () => clearTimeout(timer);
+        }
+    }, [activeResultIndex]);
 
     const currentTrack = currentGroup?.tracks?.find(t => t._id === activeSubTab);
 
@@ -197,12 +227,12 @@ const CourseCategories = () => {
                         {/* Right Column: Carousel */}
                         <div className="relative h-[400px] flex items-center justify-center overflow-hidden bg-gray-50 rounded-xl">
                             <div
-                                className="flex items-center transition-transform duration-500 ease-in-out"
+                                className={`flex items-center ${isTransitioning ? 'transition-transform duration-500 ease-in-out' : ''}`}
                                 style={{
                                     transform: `translateX(calc(50% - ${activeResultIndex * 320}px - 146px))`
                                 }}
                             >
-                                {results.map((img, index) => {
+                                {extendedResults.map((img, index) => {
                                     const isActive = index === activeResultIndex;
                                     return (
                                         <div
@@ -222,13 +252,13 @@ const CourseCategories = () => {
 
                             {/* Navigation Buttons */}
                             <button
-                                onClick={() => setActiveResultIndex(prev => prev === 0 ? results.length - 1 : prev - 1)}
+                                onClick={() => setActiveResultIndex(prev => prev - 1)}
                                 className="absolute left-4 z-20 bg-white/80 p-2 rounded-full shadow hover:bg-white text-primary transition-all"
                             >
                                 <ChevronLeft size={24} />
                             </button>
                             <button
-                                onClick={() => setActiveResultIndex(prev => prev === results.length - 1 ? 0 : prev + 1)}
+                                onClick={() => setActiveResultIndex(prev => prev + 1)}
                                 className="absolute right-4 z-20 bg-white/80 p-2 rounded-full shadow hover:bg-white text-primary transition-all"
                             >
                                 <ChevronRight size={24} />
@@ -239,8 +269,12 @@ const CourseCategories = () => {
                                 {results.map((_, index) => (
                                     <button
                                         key={index}
-                                        onClick={() => setActiveResultIndex(index)}
-                                        className={`w-2 h-2 rounded-full transition-all duration-300 ${index === activeResultIndex ? 'bg-primary w-6' : 'bg-gray-300 hover:bg-primary/50'
+                                        onClick={() => {
+                                            setIsTransitioning(true);
+                                            // Calculate the nearest index in the middle set
+                                            setActiveResultIndex(results.length + index);
+                                        }}
+                                        className={`w-2 h-2 rounded-full transition-all duration-300 ${index === (activeResultIndex % results.length) ? 'bg-primary w-6' : 'bg-gray-300 hover:bg-primary/50'
                                             }`}
                                     />
                                 ))}
