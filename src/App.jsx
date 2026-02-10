@@ -66,7 +66,6 @@ function AppContent() {
             <Route path="/careers" element={<CareersPage />} />
             <Route path="/achievements" element={<AchievementsPage />} />
             <Route path="/about" element={<AboutPage />} />
-            <Route path="/:slug" element={<NewsDetailsPage />} />
 
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
@@ -83,6 +82,9 @@ function AppContent() {
                 <Route path="schedules" element={<AdminSchedules />} />
               </Route>
             </Route>
+
+            {/* Catch-all dynamic slug route (Must be after specific routes) */}
+            <Route path="/:slug" element={<NewsDetailsPage />} />
           </Routes>
         </Suspense>
       </main>

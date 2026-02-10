@@ -55,8 +55,12 @@ app.use('/api/v1/dashboard', dashboardRoutes);
 // --- Xử lý Production (Phục vụ FE từ BE nếu cần) ---
 const NODE_ENV = process.env.NODE_ENV || 'development';
 if (NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../dist')));
-    app.get(/.*/, (req, res) => res.sendFile(path.resolve(__dirname, '../dist', 'index.html')));
+    const distPath = path.resolve(__dirname, '../dist');
+    app.use(express.static(distPath));
+    // Catch-all route to serve index.html for SPA
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(distPath, 'index.html'));
+    });
 } else {
     app.get('/', (req, res) => { res.send('Xalo English API is running...'); });
 }
