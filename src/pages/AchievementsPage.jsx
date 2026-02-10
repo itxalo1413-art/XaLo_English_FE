@@ -364,8 +364,8 @@ const AchievementsPage = () => {
 
                 <div className="container mx-auto px-4 relative z-10">
                     <h1 className="text-4xl md:text-6xl font-extrabold text-white text-center mb-4 uppercase tracking-widest drop-shadow-md">Thành Tích Học Viên</h1>
-                    <p className="text-center text-white text-lg max-w-2xl mx-auto opacity-90">
-                        Bảng vàng thành tích - Minh chứng rõ ràng nhất cho chất lượng đào tạo tại XA LỘ English.
+                    <p className="text-center text-white text-lg max-w-3xl mx-auto opacity-90">
+                        Bảng vàng thành tích - Minh chứng rõ ràng nhất cho chất lượng đào tạo tại Xa Lộ English.
                     </p>
                 </div>
                 <div className="absolute top-0 right-0 w-1/2 h-full bg-white/5 skew-x-12 pointer-events-none"></div>
