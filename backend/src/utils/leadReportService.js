@@ -24,7 +24,6 @@ export const sendLeadSummaryReport = async (reportLabel, hoursBack) => {
         const leadCount = newLeads.length;
         const leadDetails = newLeads.map((lead, index) => (
             `${index + 1}. **${lead.name}** - ${lead.phone} (${lead.email})\n` +
-+
             `   - Lúc: ${new Date(lead.createdAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })}`
         )).join('\n\n');
 

@@ -6,6 +6,7 @@ import cron from 'node-cron';
 import { sendLeadSummaryReport } from './src/utils/leadReportService.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 // Import Routes
 import authRoutes from './src/routes/authRoutes.js';
@@ -55,10 +56,14 @@ app.use('/api/v1/dashboard', dashboardRoutes);
 // --- Xử lý Production (Phục vụ FE từ BE nếu cần) ---
 const NODE_ENV = process.env.NODE_ENV || 'development';
 if (NODE_ENV === 'production') {
-    const distPath = path.resolve(__dirname, '../dist');
+    let distPath = path.resolve(__dirname, '../dist');
+    if (!fs.existsSync(path.join(distPath, 'index.html'))) {
+        distPath = path.resolve(__dirname, 'dist');
+    }
+    
     app.use(express.static(distPath));
     // Catch-all route to serve index.html for SPA
-    app.get('*', (req, res) => {
+    app.get('(.*)', (req, res) => {
         res.sendFile(path.join(distPath, 'index.html'));
     });
 } else {
