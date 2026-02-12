@@ -41,6 +41,16 @@ app.use(express.json());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// --- Xoá log cũ khi khởi động ---
+const stderrPath = path.join(__dirname, 'stderr.log');
+if (fs.existsSync(stderrPath)) {
+    try {
+        fs.writeFileSync(stderrPath, '');
+    } catch (err) {
+        console.error('Không thể xoá stderr.log:', err.message);
+    }
+}
+
 // --- API Routes ---
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/blog-posts', blogPostRoutes);
@@ -63,7 +73,7 @@ if (NODE_ENV === 'production') {
     
     app.use(express.static(distPath));
     // Catch-all route to serve index.html for SPA
-    app.get('(.*)', (req, res) => {
+    app.get('/*index', (req, res) => {
         res.sendFile(path.join(distPath, 'index.html'));
     });
 } else {
