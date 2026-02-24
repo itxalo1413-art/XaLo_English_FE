@@ -28,6 +28,30 @@ const createSchedule = asyncHandler(async (req, res) => {
     res.status(201).json(createdSchedule);
 });
 
+// @desc    Update a schedule
+// @route   PUT /api/v1/schedules/:id
+// @access  Private/Admin
+const updateSchedule = asyncHandler(async (req, res) => {
+    const schedule = await Schedule.findById(req.params.id);
+
+    if (!schedule) {
+        res.status(404);
+        throw new Error('Schedule not found');
+    }
+
+    const { title, month, scheduleImgURL } = req.body;
+
+    if (title !== undefined) schedule.title = title;
+    if (month) schedule.month = month;
+    if (scheduleImgURL) {
+        const images = Array.isArray(scheduleImgURL) ? scheduleImgURL : [scheduleImgURL];
+        schedule.scheduleImgURL = images;
+    }
+
+    const updatedSchedule = await schedule.save();
+    res.json(updatedSchedule);
+});
+
 // @desc    Delete a schedule
 // @route   DELETE /api/v1/schedules/:id
 // @access  Private/Admin
@@ -43,4 +67,4 @@ const deleteSchedule = asyncHandler(async (req, res) => {
     }
 });
 
-export { getSchedules, createSchedule, deleteSchedule };
+export { getSchedules, createSchedule, updateSchedule, deleteSchedule };

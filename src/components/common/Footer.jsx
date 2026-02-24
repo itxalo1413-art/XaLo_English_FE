@@ -8,11 +8,11 @@ const Footer = () => {
         <footer className="bg-[#C4C7EF] pt-8 md:pt-16 text-text-primary mt-12">
             <div className="container mx-auto px-4 md:px-8 xl:px-24 2xl:px-32 grid grid-cols-2 md:grid-cols-[2fr_1fr_1fr_1fr] gap-6 md:gap-12 pb-8 md:pb-16">
                 <div className="flex flex-col gap-4">
-                    <div className="flex items-center gap-2 font-bold text-2xl text-primary-dark mb-4">
-                        <div className="h-12 w-12">
-                            <img src="LOGO_MAU.png" alt="" className='w-full' />
+                    <div className="flex items-center gap-2 font-bold text-xl md:text-2xl text-primary-dark mb-4">
+                        <div className="h-8 w-8 md:h-12 md:w-12 shrink-0 flex items-center">
+                            <img src="LOGO_MAU.png" alt="" className='w-full h-full object-contain' />
                         </div>
-                        <span>xalo.english</span>
+                        <span className="leading-none">xalo.english</span>
                     </div>
                     <p className="text-sm"><b>Cơ sở 2:</b> 250 Nguyễn Đình Chính, Phường 11, Phú Nhuận, HCM.</p>
                     <p className="text-sm">Học đúng cách khi hiểu đúng mình.</p>
