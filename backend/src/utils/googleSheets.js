@@ -15,16 +15,22 @@ const appendLeadToSheet = async (leadData) => {
         const sheets = google.sheets({ version: 'v4', auth });
 
         const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+        if (!spreadsheetId) {
+            throw new Error('Missing GOOGLE_SHEET_ID in environment');
+        }
 
         // Get current month in Vietnam (Asia/Ho_Chi_Minh)
         const now = new Date();
-        const month = new Intl.DateTimeFormat('en-US', {
+        const monthNumeric = new Intl.DateTimeFormat('en-US', {
             month: '2-digit',
             timeZone: 'Asia/Ho_Chi_Minh',
         }).format(now);
 
-        const sheetName = `Tháng ${month}`;
-        const range = `${sheetName}!A:G`; // Range is now specific to the month tab
+        const monthNumber = String(parseInt(monthNumeric, 10)); // e.g. "02" -> "2"
+        const sheetNameCandidates = [
+            `Tháng ${monthNumber}`, // "Tháng 3"
+            `Tháng ${monthNumeric}`, // "Tháng 03"
+        ];
 
         // Create a consolidated message including goals and consultation time
         const fullMessage = [
@@ -34,27 +40,36 @@ const appendLeadToSheet = async (leadData) => {
         ].filter(Boolean).join('\n');
 
         const valueInputOption = 'USER_ENTERED';
-        const resource = {
-            values: [
-                [
-                    String(leadData.name || ''),
-                    String(leadData.email || ''),
-                    String(leadData.phone || ''),
-                    fullMessage,
-                    String(leadData.status || 'new'),
-                    new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
-                ],
-            ],
-        };
+        const rowValues = [
+            String(leadData.name || ''),
+            String(leadData.email || ''),
+            String(leadData.phone || ''),
+            fullMessage,
+            String(leadData.status || 'new'),
+            new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
+        ];
 
-        const result = await sheets.spreadsheets.values.append({
-            spreadsheetId,
-            range,
-            valueInputOption,
-            resource,
-        });
+        let lastError;
+        for (const sheetName of sheetNameCandidates) {
+            const range = `'${sheetName}'!A:G`; // quote sheet name (spaces) for A1 notation
 
-        console.log('%d cells appended.', result.data.updates.updatedCells);
+            try {
+                const result = await sheets.spreadsheets.values.append({
+                    spreadsheetId,
+                    range,
+                    valueInputOption,
+                    requestBody: { values: [rowValues] },
+                });
+
+                console.log(`%d cells appended. (sheet: ${sheetName})`, result.data.updates.updatedCells);
+                return;
+            } catch (error) {
+                lastError = error;
+            }
+        }
+
+        throw lastError || new Error('Unknown error appending to Google Sheet');
+
     } catch (error) {
         console.error('Error appending to Google Sheet:', error.message);
     }

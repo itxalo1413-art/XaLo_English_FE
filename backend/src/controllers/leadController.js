@@ -1,6 +1,5 @@
 import asyncHandler from 'express-async-handler';
 import Lead from '../models/leadModel.js';
-import sendEmail from '../utils/sendEmail.js';
 import appendLeadToSheet from '../utils/googleSheets.js';
 
 // @desc    Create a new lead
@@ -31,31 +30,16 @@ const createLead = asyncHandler(async (req, res) => {
         - Mục tiêu: ${createdLead.goals}
         - Thời gian tư vấn: ${createdLead.consultationTime}
     `;
-
-    try {
-        await sendEmail({
-            email: process.env.ADMIN_EMAIL,
-            subject: 'Thông báo: Có Lead mới từ Website',
-            message: emailMessage,
-            html: `<h3>Thông báo có Lead mới</h3>
-                   <p><b>Tên:</b> ${createdLead.name}</p>
-                   <p><b>Email:</b> ${createdLead.email}</p>
-                   <p><b>Số điện thoại:</b> ${createdLead.phone}</p>
-                   <p><b>Tin nhắn:</b> ${createdLead.message}</p>
-                   <p><b>Mục tiêu:</b> ${createdLead.goals}</p>
-                   <p><b>Thời gian tư vấn:</b> ${createdLead.consultationTime}</p>`,
-        });
-    } catch (error) {
-        console.error('Email notification failed:', error.message);
-    }
-    */
-
-    // Append to Google Sheets
-    try {
+try {
         await appendLeadToSheet(createdLead);
     } catch (error) {
         console.error('Google Sheets logging failed:', error.message);
     }
+
+    */
+
+    // Append to Google Sheets
+    
 
     res.status(201).json(createdLead);
 });
