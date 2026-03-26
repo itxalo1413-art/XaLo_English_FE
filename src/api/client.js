@@ -10,12 +10,17 @@ const client = axios.create({
 // Add a request interceptor to add the auth token to headers
 client.interceptors.request.use(
     (config) => {
-        const userInfo = localStorage.getItem('userInfo');
-        if (userInfo) {
-            const { token } = JSON.parse(userInfo);
-            if (token) {
-                config.headers.Authorization = `Bearer ${token}`;
+        try {
+            const userInfo = localStorage.getItem('userInfo');
+            if (userInfo) {
+                const parsed = JSON.parse(userInfo);
+                const token = parsed?.token;
+                if (token && typeof token === 'string' && token.length > 0) {
+                    config.headers.Authorization = `Bearer ${token}`;
+                }
             }
+        } catch (error) {
+            console.warn('Error reading user info from localStorage:', error);
         }
         return config;
     },

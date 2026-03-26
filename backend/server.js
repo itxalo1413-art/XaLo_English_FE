@@ -19,6 +19,7 @@ import settingRoutes from './src/routes/settingRoutes.js';
 import leadRoutes from './src/routes/leadRoutes.js';
 import programRoutes from './src/routes/programRoutes.js';
 import dashboardRoutes from './src/routes/dashboardRoutes.js';
+import jobApplicationRoutes from './src/routes/jobApplicationRoutes.js';
 
 connectDB();
 
@@ -29,17 +30,33 @@ cron.schedule('0 20 * * *', () => { sendLeadSummaryReport('20h tối', 5); }, { 
 
 const app = express();
 
-// --- Cấu hình CORS bảo mật (Lấy từ bản cũ sang) ---
+// --- Cấu hình CORS ---
+const allowedOrigins = [
+    'https://xaloenglish.vercel.app',
+    'https://www.xalo.edu.vn',
+    'https://xalo.edu.vn',
+];
+
+// Add localhost URLs in development
+if (process.env.NODE_ENV !== 'production') {
+    allowedOrigins.push('http://localhost:5175', 'http://localhost:3000', 'http://127.0.0.1:5175');
+}
+
 app.use(cors({
-    origin: ['https://xaloenglish.vercel.app', 'https://www.xalo.edu.vn', 'https://xalo.edu.vn'],
+    origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
 }));
 
+// Body parsing middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// --- Serve uploaded files ---
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // --- Xoá log cũ khi khởi động ---
 const stderrPath = path.join(__dirname, 'stderr.log');
@@ -62,6 +79,7 @@ app.use('/api/v1/settings', settingRoutes);
 app.use('/api/v1/leads', leadRoutes);
 app.use('/api/v1/programs', programRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
+app.use('/api/v1/job-applications', jobApplicationRoutes);
 
 // --- Xử lý Production (Phục vụ FE từ BE nếu cần) ---
 const NODE_ENV = process.env.NODE_ENV || 'development';

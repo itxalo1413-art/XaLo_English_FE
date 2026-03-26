@@ -35,6 +35,7 @@ const AdminMentors = lazy(() => import('./admin/pages/AdminMentors'));
 const AdminBlogPosts = lazy(() => import('./admin/pages/AdminBlogPosts'));
 const AdminStudentResults = lazy(() => import('./admin/pages/AdminStudentResults'));
 const AdminSchedules = lazy(() => import('./admin/pages/AdminSchedules'));
+const AdminApplications = lazy(() => import('./admin/pages/AdminApplications'));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -78,6 +79,7 @@ function AppContent() {
                 <Route path="student-results" element={<AdminStudentResults />} />
                 <Route path="media" element={<AdminMedia />} />
                 <Route path="leads" element={<AdminLeads />} />
+                <Route path="applications" element={<AdminApplications />} />
                 <Route path="settings" element={<AdminSettings />} />
                 <Route path="schedules" element={<AdminSchedules />} />
               </Route>

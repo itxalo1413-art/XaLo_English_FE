@@ -10,6 +10,7 @@ import {
     MessageSquare,
     Calendar,
     Settings2Icon,
+    Briefcase,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -30,6 +31,7 @@ const AdminLayout = () => {
         { path: '/admin/student-results', icon: Users, label: 'Kết quả học viên' },
         { path: '/admin/schedules', icon: Calendar, label: 'Lịch Học' },
         { path: '/admin/leads', icon: MessageSquare, label: 'Tư vấn (Leads)' },
+        { path: '/admin/applications', icon: Briefcase, label: 'Ứng Tuyển' },
         { path: '/admin/settings', icon: Settings2Icon, label: 'Cài đặt' },
     ];
 
