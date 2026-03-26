@@ -31,6 +31,7 @@ const AdminLayout = () => {
         { path: '/admin/student-results', icon: Users, label: 'Kết quả học viên' },
         { path: '/admin/schedules', icon: Calendar, label: 'Lịch Học' },
         { path: '/admin/leads', icon: MessageSquare, label: 'Tư vấn (Leads)' },
+        { path: '/admin/job-positions', icon: Briefcase, label: 'Công việc tuyển dụng' },
         { path: '/admin/applications', icon: Briefcase, label: 'Ứng Tuyển' },
         { path: '/admin/settings', icon: Settings2Icon, label: 'Cài đặt' },
     ];

@@ -20,6 +20,7 @@ import leadRoutes from './src/routes/leadRoutes.js';
 import programRoutes from './src/routes/programRoutes.js';
 import dashboardRoutes from './src/routes/dashboardRoutes.js';
 import jobApplicationRoutes from './src/routes/jobApplicationRoutes.js';
+import jobPositionRoutes from './src/routes/jobPositionRoutes.js';
 
 connectDB();
 
@@ -39,7 +40,7 @@ const allowedOrigins = [
 
 // Add localhost URLs in development
 if (process.env.NODE_ENV !== 'production') {
-    allowedOrigins.push('http://localhost:5175', 'http://localhost:3000', 'http://127.0.0.1:5175');
+    allowedOrigins.push('http://localhost:5175','http://localhost:5174','http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5175','http://127.0.0.1:5173');
 }
 
 app.use(cors({
@@ -80,6 +81,7 @@ app.use('/api/v1/leads', leadRoutes);
 app.use('/api/v1/programs', programRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/job-applications', jobApplicationRoutes);
+app.use('/api/v1/job-positions', jobPositionRoutes);
 
 // --- Xử lý Production (Phục vụ FE từ BE nếu cần) ---
 const NODE_ENV = process.env.NODE_ENV || 'development';

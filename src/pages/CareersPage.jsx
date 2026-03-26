@@ -2,6 +2,7 @@ import React from 'react';
 import Section from '../components/common/Section';
 import Button from '../components/common/Button';
 import ApplicationForm from '../admin/components/ApplicationForm';
+import client from '../api/client';
 import { DollarSign, Smile, Plane, Gift } from 'lucide-react';
 import slider_khac from '../assets/slider/sliderKhac.png'
 
@@ -28,6 +29,59 @@ const CareersPage = () => {
 
     const [activeTab, setActiveTab] = React.useState('job-openings');
     const [applicationForm, setApplicationForm] = React.useState({ isOpen: false, position: '' });
+    const hardcodedJobTitlesJobOpenings = ['Cộng Tác Viên Sales', 'Nhân Viên Tư Vấn Khóa Học'];
+    const hardcodedAcademicTitles = ['Giáo viên IELTS'];
+    const [jobPositions, setJobPositions] = React.useState([]);
+    const [jobPositionsLoading, setJobPositionsLoading] = React.useState(true);
+
+    React.useEffect(() => {
+        let isMounted = true;
+        const loadPositions = async () => {
+            try {
+                const response = await client.get('/job-positions');
+                if (!isMounted) return;
+                setJobPositions(Array.isArray(response.data) ? response.data : []);
+            } catch (err) {
+                console.error('Failed to fetch job positions:', err);
+                if (!isMounted) return;
+                setJobPositions([]);
+            } finally {
+                if (!isMounted) return;
+                setJobPositionsLoading(false);
+            }
+        };
+
+        loadPositions();
+        return () => {
+            isMounted = false;
+        };
+    }, []);
+
+    const isIeltsRole = (pos) => {
+        // User requirement: roles with IELTS requirements should appear in tab ACADEMIC.
+        const requirementsText = Array.isArray(pos?.requirements) ? pos.requirements.join(' ') : '';
+        const requirementsLower = requirementsText.toLowerCase();
+        if (requirementsLower.includes('ielts')) return true;
+
+        // Fallback: if requirements are empty/absent, use title/description to avoid missing roles.
+        if (!requirementsLower.trim()) {
+            const titleText = (pos?.title || '').toLowerCase();
+            const descriptionText = (pos?.description || '').toLowerCase();
+            return `${titleText} ${descriptionText}`.includes('ielts');
+        }
+
+        return false;
+    };
+
+    const additionalJobPositions = jobPositions.filter((pos) => {
+        if (!pos?.title) return false;
+        if (hardcodedJobTitlesJobOpenings.includes(pos.title)) return false;
+        if (hardcodedAcademicTitles.includes(pos.title)) return false;
+        return true;
+    });
+
+    const academicAdditionalJobPositions = additionalJobPositions.filter(isIeltsRole);
+    const jobOpeningsAdditionalJobPositions = additionalJobPositions.filter((pos) => !isIeltsRole(pos));
 
     return (
         <div className="pt-20 bg-white">
@@ -197,6 +251,74 @@ const CareersPage = () => {
 
                                     <Button variant="primary" size="small" className="shadow-md hover:shadow-lg" onClick={() => setApplicationForm({ isOpen: true, position: 'Nhân Viên Tư Vấn Khóa Học' })}>Apply now</Button>
                                 </div>
+
+                                {!jobPositionsLoading && jobOpeningsAdditionalJobPositions.length > 0 && (
+                                    <>
+                                        {jobOpeningsAdditionalJobPositions.map((pos) => (
+                                            <div
+                                                key={pos._id || pos.title}
+                                                className="border-b border-gray-100 pb-8 mb-8 last:border-0 last:pb-0 last:mb-0"
+                                            >
+                                                <h3 className="text-2xl font-bold text-primary-dark mb-6">
+                                                    {pos.title}
+                                                </h3>
+
+                                                {/* Job Description */}
+                                                <div className="mb-6">
+                                                    <h4 className="text-lg font-bold text-primary-dark mb-4">Mô tả công việc</h4>
+                                                    {pos.description ? (
+                                                        <p className="text-text-secondary whitespace-pre-line">
+                                                            {pos.description}
+                                                        </p>
+                                                    ) : (
+                                                        <p className="text-text-secondary">N/A</p>
+                                                    )}
+                                                </div>
+
+                                                {/* Candidate Requirements */}
+                                                {Array.isArray(pos.requirements) && pos.requirements.length > 0 && (
+                                                    <div className="mb-6">
+                                                        <h4 className="text-lg font-bold text-primary-dark mb-4">Yêu cầu ứng viên</h4>
+                                                        <ul className="list-disc list-inside text-text-secondary space-y-2 mb-4">
+                                                            {pos.requirements.map((req, idx) => (
+                                                                <li key={`${pos.title}-req-${idx}`}>{req}</li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                )}
+
+                                                {/* Salary */}
+                                                <div className="mb-6">
+                                                    <h4 className="text-lg font-bold text-primary-dark mb-4">Thu nhập</h4>
+                                                    <ul className="list-disc list-inside text-text-secondary space-y-2 mb-4">
+                                                        <li>{pos.salary || 'Thương lượng'}</li>
+                                                    </ul>
+                                                </div>
+
+                                                {/* Benefits */}
+                                                {Array.isArray(pos.benefits) && pos.benefits.length > 0 && (
+                                                    <div className="mb-6">
+                                                        <h4 className="text-lg font-bold text-primary-dark mb-4">Quyền lợi</h4>
+                                                        <ul className="list-disc list-inside text-text-secondary space-y-2 mb-4">
+                                                            {pos.benefits.map((benefit, idx) => (
+                                                                <li key={`${pos.title}-benefit-${idx}`}>{benefit}</li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                )}
+
+                                                <Button
+                                                    variant="primary"
+                                                    size="small"
+                                                    className="shadow-md hover:shadow-lg"
+                                                    onClick={() => setApplicationForm({ isOpen: true, position: pos.title })}
+                                                >
+                                                    Apply now
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </>
+                                )}
                             </>
                         )}
 
@@ -245,6 +367,70 @@ const CareersPage = () => {
                                 </div>
 
                                 <Button variant="primary" size="small" className="shadow-md hover:shadow-lg" onClick={() => setApplicationForm({ isOpen: true, position: 'Giáo viên IELTS' })}>Apply now</Button>
+
+                                {!jobPositionsLoading && academicAdditionalJobPositions.length > 0 && (
+                                    <>
+                                        {academicAdditionalJobPositions.map((pos) => (
+                                            <div
+                                                key={pos._id || pos.title}
+                                                className="border-b border-gray-100 pb-8 mb-8 last:border-0 last:pb-0 last:mb-0"
+                                            >
+                                                <h3 className="text-2xl font-bold text-primary-dark mb-6">
+                                                    {pos.title}
+                                                </h3>
+
+                                                <div className="mb-6">
+                                                    <h4 className="text-lg font-bold text-primary-dark mb-4">Mô tả công việc</h4>
+                                                    {pos.description ? (
+                                                        <p className="text-text-secondary whitespace-pre-line">
+                                                            {pos.description}
+                                                        </p>
+                                                    ) : (
+                                                        <p className="text-text-secondary">N/A</p>
+                                                    )}
+                                                </div>
+
+                                                {Array.isArray(pos.requirements) && pos.requirements.length > 0 && (
+                                                    <div className="mb-6">
+                                                        <h4 className="text-lg font-bold text-primary-dark mb-4">Yêu cầu ứng viên</h4>
+                                                        <ul className="list-disc list-inside text-text-secondary space-y-2 mb-4">
+                                                            {pos.requirements.map((req, idx) => (
+                                                                <li key={`${pos.title}-req-${idx}`}>{req}</li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                )}
+
+                                                <div className="mb-6">
+                                                    <h4 className="text-lg font-bold text-primary-dark mb-4">Thu nhập</h4>
+                                                    <ul className="list-disc list-inside text-text-secondary space-y-2 mb-4">
+                                                        <li>{pos.salary || 'Thương lượng'}</li>
+                                                    </ul>
+                                                </div>
+
+                                                {Array.isArray(pos.benefits) && pos.benefits.length > 0 && (
+                                                    <div className="mb-6">
+                                                        <h4 className="text-lg font-bold text-primary-dark mb-4">Quyền lợi</h4>
+                                                        <ul className="list-disc list-inside text-text-secondary space-y-2 mb-4">
+                                                            {pos.benefits.map((benefit, idx) => (
+                                                                <li key={`${pos.title}-benefit-${idx}`}>{benefit}</li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                )}
+
+                                                <Button
+                                                    variant="primary"
+                                                    size="small"
+                                                    className="shadow-md hover:shadow-lg"
+                                                    onClick={() => setApplicationForm({ isOpen: true, position: pos.title })}
+                                                >
+                                                    Apply now
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </>
+                                )}
                             </div>
                         )}
                     </div>
