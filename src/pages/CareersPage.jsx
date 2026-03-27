@@ -10,19 +10,19 @@ import slider_khac from '../assets/slider/sliderKhac.png'
 const CareersPage = () => {
     const benefits = [
         {
-            image: "https://xalo.edu.vn/image/catalog/services/recruitment/svg-1.svg",
+            image: "salary.png",
             title: "Mức lương cao trong thị trường tuyển dụng"
         },
         {
-            image: "https://xalo.edu.vn/image/catalog/services/recruitment/svg-4.svg",
+            image: "dynamic.png",
             title: "Môi trường làm việc trẻ, cởi mở, năng động, tôn trọng và tạo điều kiện phát huy giá trị bản thân"
         },
         {
-            image: "https://xalo.edu.vn/image/catalog/services/recruitment/svg-3.svg",
+            image: "travel.png",
             title: "Mỗi năm đi du lịch 2-3 lần"
         },
         {
-            image: "https://xalo.edu.vn/image/catalog/services/recruitment/svg-2.svg",
+            image: "policy.png",
             title: "Được hưởng các quyền lợi theo chính sách của công ty"
         }
     ];
