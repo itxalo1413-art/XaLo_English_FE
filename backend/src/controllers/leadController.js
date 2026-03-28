@@ -19,27 +19,12 @@ const createLead = asyncHandler(async (req, res) => {
 
     const createdLead = await lead.save();
 
-    /* 
-    // Commented out: No longer sending instant email notifications per user request
-    const emailMessage = `
-        Bạn có một Lead mới từ hệ thống:
-        - Tên: ${createdLead.name}
-        - Email: ${createdLead.email}
-        - Số điện thoại: ${createdLead.phone}
-        - Tin nhắn: ${createdLead.message}
-        - Mục tiêu: ${createdLead.goals}
-        - Thời gian tư vấn: ${createdLead.consultationTime}
-    `;
-try {
+    // Append to Google Sheets
+    try {
         await appendLeadToSheet(createdLead);
     } catch (error) {
         console.error('Google Sheets logging failed:', error.message);
     }
-
-    */
-
-    // Append to Google Sheets
-    
 
     res.status(201).json(createdLead);
 });
