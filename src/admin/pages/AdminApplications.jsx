@@ -83,6 +83,25 @@ const AdminApplications = () => {
         }
     };
 
+    const handleDownload = async (applicationId, filename) => {
+        try {
+            const response = await client.get(`/job-applications/download/${applicationId}`, {
+                responseType: 'blob',
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', filename || 'CV.pdf');
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Error downloading CV:', error);
+            alert('Lỗi khi tải CV: ' + (error.response?.data?.message || error.message));
+        }
+    };
+
     const handleDelete = async (applicationId) => {
         if (window.confirm('Bạn có chắc muốn xóa ứng tuyển này?')) {
             try {
@@ -252,13 +271,13 @@ const AdminApplications = () => {
                                             >
                                                 <Eye size={18} />
                                             </button>
-                                            <a
-                                                href={`${import.meta.env.VITE_API_URL || '/api/v1'}/job-applications/download/${application._id}`}
+                                            <button
+                                                onClick={() => handleDownload(application._id, application.resumePdf?.originalName)}
                                                 className="text-green-600 hover:text-green-800 transition"
                                                 title="Tải CV"
                                             >
                                                 <Download size={18} />
-                                            </a>
+                                            </button>
                                             <button
                                                 onClick={() => handleDelete(application._id)}
                                                 className="text-red-600 hover:text-red-800 transition"
@@ -329,13 +348,13 @@ const AdminApplications = () => {
                                 <div>
                                     <h3 className="text-lg font-semibold text-gray-800 mb-2">CV</h3>
                                     {selectedApplication.resumePdf ? (
-                                        <a
-                                            href={`${import.meta.env.VITE_API_URL || '/api/v1'}/job-applications/download/${selectedApplication._id}`}
+                                        <button
+                                            onClick={() => handleDownload(selectedApplication._id, selectedApplication.resumePdf.originalName)}
                                             className="text-blue-600 hover:text-blue-800 underline flex items-center gap-2"
                                         >
                                             <Download size={18} />
                                             Tải {selectedApplication.resumePdf.originalName || 'CV'}
-                                        </a>
+                                        </button>
                                     ) : (
                                         <p className="text-gray-500">Không có file CV</p>
                                     )}
