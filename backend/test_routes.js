@@ -16,6 +16,8 @@ tests.forEach(test => {
     } catch (err) {
         console.log(`❌ ${test.name} ("${test.path}"): ${err.message}`);
     }
+
+    
 });
 
 process.exit(0);

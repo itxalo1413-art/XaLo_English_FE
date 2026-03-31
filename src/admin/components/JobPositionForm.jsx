@@ -3,7 +3,10 @@ import { X } from 'lucide-react';
 import Button from '../../components/common/Button'
 
 const JobPositionForm = ({ initialData = null, onSubmit, onClose }) => {
-    const [formData, setFormData] = useState(initialData || {
+    const [formData, setFormData] = useState(initialData ? {
+        ...initialData,
+        displayOrder: initialData.displayOrder ?? 0,
+    } : {
         title: '',
         description: '',
         requirements: [],
@@ -11,6 +14,7 @@ const JobPositionForm = ({ initialData = null, onSubmit, onClose }) => {
         salary: '',
         location: 'Hà Nội',
         type: 'Full-time',
+        displayOrder: 0,
         isActive: true,
     });
 
@@ -236,6 +240,21 @@ const JobPositionForm = ({ initialData = null, onSubmit, onClose }) => {
                             <option value="Part-time">Part-time</option>
                             <option value="Contract">Contract</option>
                         </select>
+                    </div>
+
+                    {/* Display Order */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Thứ tự hiển thị</label>
+                        <input
+                            type="number"
+                            name="displayOrder"
+                            value={formData.displayOrder}
+                            onChange={handleChange}
+                            min="0"
+                            placeholder="Số càng nhỏ hiển thị càng trước"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Số nhỏ sẽ được ưu tiên hiển thị trước.</p>
                     </div>
 
                     {/* Active Status */}

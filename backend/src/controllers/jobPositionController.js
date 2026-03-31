@@ -5,7 +5,7 @@ import JobPosition from '../models/jobPositionModel.js';
 // @route   POST /api/v1/job-positions
 // @access  Private/Admin
 const createJobPosition = asyncHandler(async (req, res) => {
-    const { title, description, requirements, benefits, salary, location, type } = req.body;
+    const { title, description, requirements, benefits, salary, location, type, displayOrder } = req.body;
 
     // Validate required fields
     if (!title || !description) {
@@ -28,6 +28,7 @@ const createJobPosition = asyncHandler(async (req, res) => {
         salary,
         location,
         type,
+        displayOrder: Number.isFinite(Number(displayOrder)) ? Number(displayOrder) : 0,
     });
 
     const createdPosition = await jobPosition.save();
@@ -38,7 +39,7 @@ const createJobPosition = asyncHandler(async (req, res) => {
 // @route   GET /api/v1/job-positions
 // @access  Public
 const getAllJobPositions = asyncHandler(async (req, res) => {
-    const positions = await JobPosition.find({ isActive: true }).sort({ createdAt: -1 });
+    const positions = await JobPosition.find({ isActive: true }).sort({ displayOrder: 1, createdAt: -1 });
     res.status(200).json(positions);
 });
 
@@ -46,7 +47,7 @@ const getAllJobPositions = asyncHandler(async (req, res) => {
 // @route   GET /api/v1/job-positions/admin/all
 // @access  Private/Admin
 const getAllJobPositionsAdmin = asyncHandler(async (req, res) => {
-    const positions = await JobPosition.find().sort({ createdAt: -1 });
+    const positions = await JobPosition.find().sort({ displayOrder: 1, createdAt: -1 });
     res.status(200).json(positions);
 });
 
@@ -68,7 +69,7 @@ const getJobPositionById = asyncHandler(async (req, res) => {
 // @route   PUT /api/v1/job-positions/:id
 // @access  Private/Admin
 const updateJobPosition = asyncHandler(async (req, res) => {
-    const { title, description, requirements, benefits, salary, location, type, isActive } = req.body;
+    const { title, description, requirements, benefits, salary, location, type, displayOrder, isActive } = req.body;
 
     const position = await JobPosition.findById(req.params.id);
 
@@ -93,6 +94,9 @@ const updateJobPosition = asyncHandler(async (req, res) => {
     position.salary = salary || position.salary;
     position.location = location || position.location;
     position.type = type || position.type;
+    position.displayOrder = Number.isFinite(Number(displayOrder))
+        ? Number(displayOrder)
+        : position.displayOrder;
     position.isActive = isActive !== undefined ? isActive : position.isActive;
 
     const updatedPosition = await position.save();

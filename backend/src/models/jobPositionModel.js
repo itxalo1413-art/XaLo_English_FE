@@ -9,6 +9,7 @@ const jobPositionSchema = mongoose.Schema(
         salary: { type: String }, // e.g., "8-15 triệu"
         location: { type: String, default: 'Hà Nội' },
         type: { type: String, enum: ['Full-time', 'Part-time', 'Contract'], default: 'Full-time' },
+        displayOrder: { type: Number, default: 0 },
         isActive: { type: Boolean, default: true },
     },
     {

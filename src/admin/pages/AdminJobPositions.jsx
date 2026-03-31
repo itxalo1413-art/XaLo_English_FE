@@ -67,6 +67,40 @@ const AdminJobPositions = () => {
         }
     };
 
+    const movePosition = async (index, direction) => {
+        const targetIndex = direction === 'up' ? index - 1 : index + 1;
+        if (targetIndex < 0 || targetIndex >= positions.length) return;
+
+        const current = positions[index];
+        const target = positions[targetIndex];
+
+        const buildPayload = (position, displayOrder) => ({
+            title: position.title,
+            description: position.description,
+            requirements: position.requirements || [],
+            benefits: position.benefits || [],
+            salary: position.salary || '',
+            location: position.location || 'Hà Nội',
+            type: position.type || 'Full-time',
+            isActive: position.isActive ?? true,
+            displayOrder,
+        });
+
+        try {
+            const currentOrder = Number.isFinite(Number(current.displayOrder)) ? Number(current.displayOrder) : 0;
+            const targetOrder = Number.isFinite(Number(target.displayOrder)) ? Number(target.displayOrder) : 0;
+
+            await Promise.all([
+                client.put(`/job-positions/${current._id}`, buildPayload(current, targetOrder)),
+                client.put(`/job-positions/${target._id}`, buildPayload(target, currentOrder)),
+            ]);
+
+            await fetchPositions();
+        } catch (err) {
+            setError(err.response?.data?.message || 'Không thể cập nhật thứ tự hiển thị');
+        }
+    };
+
     const getTypeColor = (type) => {
         switch (type) {
             case 'Full-time':
@@ -128,6 +162,7 @@ const AdminJobPositions = () => {
                     <table className="w-full">
                         <thead className="bg-gray-50 border-b">
                             <tr>
+                                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Thứ tự</th>
                                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Tiêu đề</th>
                                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Loại</th>
                                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Mức lương</th>
@@ -137,8 +172,11 @@ const AdminJobPositions = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {positions.map(position => (
+                            {positions.map((position, index) => (
                                 <tr key={position._id} className="border-b hover:bg-gray-50">
+                                    <td className="px-6 py-4 text-sm text-gray-800">
+                                        {Number.isFinite(Number(position.displayOrder)) ? Number(position.displayOrder) : 0}
+                                    </td>
                                     <td className="px-6 py-4">
                                         <div>
                                             <p className="font-medium text-gray-800">{position.title}</p>
@@ -163,6 +201,22 @@ const AdminJobPositions = () => {
                                     </td>
                                     <td className="px-6 py-4 text-center">
                                         <div className="flex justify-center gap-2">
+                                            <button
+                                                onClick={() => movePosition(index, 'up')}
+                                                className="text-gray-600 hover:text-gray-900 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                                                title="Đưa lên"
+                                                disabled={index === 0}
+                                            >
+                                                ↑
+                                            </button>
+                                            <button
+                                                onClick={() => movePosition(index, 'down')}
+                                                className="text-gray-600 hover:text-gray-900 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                                                title="Đưa xuống"
+                                                disabled={index === positions.length - 1}
+                                            >
+                                                ↓
+                                            </button>
                                             <button
                                                 onClick={() => handleOpenForm(position)}
                                                 className="text-blue-600 hover:text-blue-800 transition"
