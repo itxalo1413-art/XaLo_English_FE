@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
 import client from '../../api/client';
+import { AdminButton, AdminField, AdminInput, AdminModal } from './ui/AdminUI';
 
 const ProgramGroupForm = ({ group, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -49,83 +49,43 @@ const ProgramGroupForm = ({ group, onClose, onSuccess }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-                <div className="flex justify-between items-center p-6 border-b">
-                    <h2 className="text-xl font-bold text-gray-800">
-                        {group ? 'Edit Program Group' : 'Add Program Group'}
-                    </h2>
-                    <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-                        <X size={24} />
-                    </button>
+        <AdminModal
+            title={group ? 'Sửa Group' : 'Thêm Group'}
+            description="Dùng để phân loại chương trình (online/offline...)."
+            onClose={onClose}
+            footer={
+                <>
+                    <AdminButton variant="secondary" type="button" onClick={onClose}>
+                        Hủy
+                    </AdminButton>
+                    <AdminButton type="submit" form="program-group-form" disabled={saving}>
+                        {saving ? 'Đang lưu...' : group ? 'Cập nhật' : 'Tạo mới'}
+                    </AdminButton>
+                </>
+            }
+        >
+            <form id="program-group-form" onSubmit={handleSubmit} className="space-y-4">
+                {error ? (
+                    <div className="bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-2xl text-sm font-semibold">
+                        {error}
+                    </div>
+                ) : null}
+
+                <div className="grid grid-cols-1 gap-4">
+                    <AdminField label="Name">
+                        <AdminInput name="name" value={formData.name} onChange={handleChange} required />
+                    </AdminField>
+
+                    <AdminField label="Slug" hint="Ví dụ: ielts-offline">
+                        <AdminInput name="slug" value={formData.slug} onChange={handleChange} required />
+                    </AdminField>
+
+                    <AdminField label="Order" hint="Số nhỏ hiển thị trước">
+                        <AdminInput type="number" name="order" value={formData.order} onChange={handleChange} required />
+                    </AdminField>
                 </div>
-
-                <form onSubmit={handleSubmit} className="p-6">
-                    {error && (
-                        <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>
-                    )}
-
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Name
-                        </label>
-                        <input
-                            type="text"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            required
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Slug
-                        </label>
-                        <input
-                            type="text"
-                            name="slug"
-                            value={formData.slug}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            required
-                        />
-                    </div>
-
-                    <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Order
-                        </label>
-                        <input
-                            type="number"
-                            name="order"
-                            value={formData.order}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            required
-                        />
-                    </div>
-
-                    <div className="flex justify-end gap-4">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={saving}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-                        >
-                            {saving ? 'Saving...' : group ? 'Update Group' : 'Create Group'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+            </form>
+        </AdminModal>
     );
 };
 

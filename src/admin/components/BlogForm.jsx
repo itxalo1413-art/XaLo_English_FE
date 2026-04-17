@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import client from '../../api/client';
+import { AdminButton, AdminField, AdminInput, AdminModal, AdminTextarea } from './ui/AdminUI';
 
 const BlogForm = ({ blog, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -88,115 +89,53 @@ const BlogForm = ({ blog, onClose, onSuccess }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                <div className="flex justify-between items-center p-6 border-b">
-                    <h2 className="text-xl font-bold text-gray-800">
-                        {blog ? 'Edit Blog' : 'Add New Blog'}
-                    </h2>
-                    <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-                        <X size={24} />
-                    </button>
+        <AdminModal
+            title={blog ? 'Sửa Blog' : 'Thêm Blog'}
+            description="Quản lý blogs (legacy)."
+            onClose={onClose}
+            footer={
+                <>
+                    <AdminButton variant="secondary" type="button" onClick={onClose}>
+                        Hủy
+                    </AdminButton>
+                    <AdminButton type="submit" form="blog-form" disabled={uploading}>
+                        {uploading ? 'Đang lưu...' : blog ? 'Cập nhật' : 'Tạo mới'}
+                    </AdminButton>
+                </>
+            }
+        >
+            <form id="blog-form" onSubmit={handleSubmit} className="space-y-5">
+                {error ? (
+                    <div className="bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-2xl text-sm font-semibold">
+                        {error}
+                    </div>
+                ) : null}
+
+                <AdminField label="Title">
+                    <AdminInput name="title" value={formData.title} onChange={handleChange} required />
+                </AdminField>
+
+                <AdminField label="Content (HTML/Markdown)">
+                    <AdminTextarea name="content" value={formData.content} onChange={handleChange} rows={8} required />
+                </AdminField>
+
+                <AdminField label="Featured Image">
+                    <input type="file" accept="image/*" onChange={handleImageChange} className="w-full text-sm font-semibold text-slate-600" />
+                    {formData.image_url && !imageFile ? (
+                        <img src={formData.image_url} alt="Preview" className="mt-3 h-40 w-auto object-cover rounded-2xl border border-slate-200" />
+                    ) : null}
+                </AdminField>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <AdminField label="Meta Title">
+                        <AdminInput name="meta_title" value={formData.meta_title} onChange={handleChange} />
+                    </AdminField>
+                    <AdminField label="Meta Description">
+                        <AdminInput name="meta_description" value={formData.meta_description} onChange={handleChange} />
+                    </AdminField>
                 </div>
-
-                <form onSubmit={handleSubmit} className="p-6">
-                    {error && (
-                        <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>
-                    )}
-
-                    <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Title
-                        </label>
-                        <input
-                            type="text"
-                            name="title"
-                            value={formData.title}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            required
-                        />
-                    </div>
-
-                    <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Content (HTML/Markdown)
-                        </label>
-                        <textarea
-                            name="content"
-                            value={formData.content}
-                            onChange={handleChange}
-                            rows="8"
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            required
-                        ></textarea>
-                    </div>
-
-                    <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Featured Image
-                        </label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="w-full"
-                        />
-                        {formData.image_url && !imageFile && (
-                            <img
-                                src={formData.image_url}
-                                alt="Preview"
-                                className="mt-2 h-32 object-cover rounded"
-                            />
-                        )}
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Meta Title
-                            </label>
-                            <input
-                                type="text"
-                                name="meta_title"
-                                value={formData.meta_title}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Meta Description
-                            </label>
-                            <input
-                                type="text"
-                                name="meta_description"
-                                value={formData.meta_description}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex justify-end gap-4">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={uploading}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-                        >
-                            {uploading ? 'Uploading...' : blog ? 'Update Blog' : 'Create Blog'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+            </form>
+        </AdminModal>
     );
 };
 

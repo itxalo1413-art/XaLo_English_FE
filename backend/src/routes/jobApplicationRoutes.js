@@ -48,7 +48,14 @@ const upload = multer({
 const router = express.Router();
 
 // Public routes
-router.post('/', upload.single('resumePdf'), createJobApplication);
+router.post(
+    '/',
+    upload.fields([
+        { name: 'resumePdf', maxCount: 1 },
+        { name: 'certificatesPdf', maxCount: 1 },
+    ]),
+    createJobApplication
+);
 
 // Admin routes
 router.get('/', protect, admin, getAllJobApplications);
@@ -76,6 +83,25 @@ router.get('/download/:applicationId', protect, admin, asyncHandler(async (req, 
     }
     
     res.download(filepath, application.resumePdf.originalName);
+}));
+
+// Download certificates endpoint
+router.get('/download-certificates/:applicationId', protect, admin, asyncHandler(async (req, res) => {
+    const { applicationId } = req.params;
+
+    const application = await JobApplication.findById(applicationId);
+
+    if (!application || !application.certificatesPdf) {
+        return res.status(404).json({ message: 'File not found' });
+    }
+
+    const filepath = path.join(__dirname, '../../uploads/applications', application.certificatesPdf.filename);
+
+    if (!fs.existsSync(filepath)) {
+        return res.status(404).json({ message: 'File not found on server' });
+    }
+
+    res.download(filepath, application.certificatesPdf.originalName);
 }));
 
 export default router;

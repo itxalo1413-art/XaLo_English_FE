@@ -27,33 +27,42 @@ const AdminLogin = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-            <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+            <div className="w-full max-w-md">
+                <div className="mb-6 text-center">
+                    <div className="mx-auto mb-4 h-14 w-14 rounded-2xl bg-indigo-600 text-white grid place-items-center text-2xl font-extrabold shadow-sm">
+                        X
+                    </div>
+                    <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Đăng nhập Admin</h1>
+                    <p className="text-slate-600 text-sm font-medium mt-1">Quản trị XaloEnglish</p>
+                </div>
+
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 w-full">
                 <div className="text-center mb-8">
-                    <h1 className="text-2xl font-bold text-gray-800">Admin Login</h1>
-                    <p className="text-gray-600">Sign in to manage Xalo English</p>
+                    <h2 className="text-lg font-extrabold text-slate-900">Thông tin đăng nhập</h2>
+                    <p className="text-slate-500 text-sm font-medium">Nhập email và mật khẩu quản trị</p>
                 </div>
 
                 {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    <div className="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-xl mb-4 text-sm font-semibold">
                         {error}
                     </div>
                 )}
 
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+                        <label className="block text-slate-700 text-sm font-extrabold mb-2" htmlFor="email">
                             Email Address
                         </label>
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Mail className="h-5 w-5 text-gray-400" />
+                                <Mail className="h-5 w-5 text-slate-400" />
                             </div>
                             <input
                                 id="email"
                                 type="email"
-                                className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="admin@example.com"
+                                className="pl-10 w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-slate-900 font-semibold"
+                                placeholder="admin@xalo.edu.vn"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
@@ -62,17 +71,17 @@ const AdminLogin = () => {
                     </div>
 
                     <div className="mb-6">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+                        <label className="block text-slate-700 text-sm font-extrabold mb-2" htmlFor="password">
                             Password
                         </label>
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Lock className="h-5 w-5 text-gray-400" />
+                                <Lock className="h-5 w-5 text-slate-400" />
                             </div>
                             <input
                                 id="password"
                                 type={showPassword ? "text" : "password"}
-                                className="pl-10 pr-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="pl-10 pr-10 w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-slate-900 font-semibold"
                                 placeholder="••••••••"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
@@ -81,7 +90,7 @@ const AdminLogin = () => {
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
                             >
                                 {showPassword ? (
                                     <EyeOff className="h-5 w-5" />
@@ -94,11 +103,12 @@ const AdminLogin = () => {
 
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                        className="w-full bg-indigo-600 text-white font-extrabold py-2.5 px-4 rounded-xl hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
                     >
-                        Sign In
+                        Đăng nhập
                     </button>
                 </form>
+            </div>
             </div>
         </div>
     );

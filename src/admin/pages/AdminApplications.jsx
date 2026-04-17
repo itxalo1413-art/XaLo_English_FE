@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import client from '../../api/client';
 import Button from '../../components/common/Button';
 import { Trash2, Eye, Download, MessageSquare } from 'lucide-react';
+import { AdminCard, AdminCardBody, AdminPageHeader, AdminTable } from '../components/ui/AdminUI';
 
 const AdminApplications = () => {
     const [applications, setApplications] = useState([]);
@@ -102,6 +103,25 @@ const AdminApplications = () => {
         }
     };
 
+    const handleDownloadCertificates = async (applicationId, filename) => {
+        try {
+            const response = await client.get(`/job-applications/download-certificates/${applicationId}`, {
+                responseType: 'blob',
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', filename || 'Chung-chi.pdf');
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Error downloading certificates:', error);
+            alert('Lỗi khi tải chứng chỉ: ' + (error.response?.data?.message || error.message));
+        }
+    };
+
     const handleDelete = async (applicationId) => {
         if (window.confirm('Bạn có chắc muốn xóa ứng tuyển này?')) {
             try {
@@ -130,7 +150,7 @@ const AdminApplications = () => {
     if (loading) {
         return (
             <div className="flex items-center justify-center h-96">
-                <p>Đang tải...</p>
+                <p className="text-sm font-semibold text-slate-600">Đang tải...</p>
             </div>
         );
     }
@@ -138,13 +158,13 @@ const AdminApplications = () => {
     if (error) {
         return (
             <div className="space-y-6">
-                <h1 className="text-3xl font-bold text-gray-800">Ứng Tuyển Việc Làm</h1>
-                <div className="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-lg">
-                    <p className="font-semibold mb-2">Có lỗi xảy ra</p>
+                <AdminPageHeader title="Ứng tuyển" subtitle="Quản lý tất cả ứng tuyển công việc." />
+                <div className="bg-rose-50 border border-rose-200 text-rose-700 px-6 py-4 rounded-2xl">
+                    <p className="font-extrabold mb-2">Có lỗi xảy ra</p>
                     <p className="mb-4">{error}</p>
                     <button
                         onClick={fetchApplications}
-                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition"
+                        className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-xl transition font-extrabold"
                     >
                         Thử lại
                     </button>
@@ -155,55 +175,62 @@ const AdminApplications = () => {
 
     return (
         <div className="space-y-6">
-            {/* Header */}
-            <div>
-                    <h1 className="text-3xl font-bold text-gray-800">Ứng Tuyển Việc Làm</h1>
-                    <p className="text-gray-600 mt-2">Quản lý tất cả ứng tuyển công việc</p>
-                </div>
+            <AdminPageHeader title="Ứng tuyển" subtitle="Quản lý tất cả ứng tuyển công việc." />
 
                 {/* Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                    <div className="bg-white p-4 rounded-lg shadow">
+                    <AdminCard>
+                        <AdminCardBody>
                         <p className="text-gray-500 text-sm">Tổng Ứng Tuyển</p>
-                        <p className="text-3xl font-bold text-gray-800">{applications.length}</p>
-                    </div>
-                    <div className="bg-white p-4 rounded-lg shadow">
+                        <p className="text-3xl font-extrabold text-slate-900">{applications.length}</p>
+                        </AdminCardBody>
+                    </AdminCard>
+                    <AdminCard>
+                        <AdminCardBody>
                         <p className="text-gray-500 text-sm">Mới</p>
-                        <p className="text-3xl font-bold text-blue-600">
+                        <p className="text-3xl font-extrabold text-blue-600">
                             {applications.filter(a => a.status === 'new').length}
                         </p>
-                    </div>
-                    <div className="bg-white p-4 rounded-lg shadow">
+                        </AdminCardBody>
+                    </AdminCard>
+                    <AdminCard>
+                        <AdminCardBody>
                         <p className="text-gray-500 text-sm">Được Chọn</p>
-                        <p className="text-3xl font-bold text-green-600">
+                        <p className="text-3xl font-extrabold text-green-600">
                             {applications.filter(a => a.status === 'shortlisted').length}
                         </p>
-                    </div>
-                    <div className="bg-white p-4 rounded-lg shadow">
+                        </AdminCardBody>
+                    </AdminCard>
+                    <AdminCard>
+                        <AdminCardBody>
                         <p className="text-gray-500 text-sm">Được Tuyển</p>
-                        <p className="text-3xl font-bold text-purple-600">
+                        <p className="text-3xl font-extrabold text-purple-600">
                             {applications.filter(a => a.status === 'hired').length}
                         </p>
-                    </div>
-                    <div className="bg-white p-4 rounded-lg shadow">
+                        </AdminCardBody>
+                    </AdminCard>
+                    <AdminCard>
+                        <AdminCardBody>
                         <p className="text-gray-500 text-sm">Bị Loại</p>
-                        <p className="text-3xl font-bold text-red-600">
+                        <p className="text-3xl font-extrabold text-red-600">
                             {applications.filter(a => a.status === 'rejected').length}
                         </p>
-                    </div>
+                        </AdminCardBody>
+                    </AdminCard>
                 </div>
 
                 {/* Filters */}
-                <div className="bg-white p-6 rounded-lg shadow">
+                <AdminCard>
+                    <AdminCardBody>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            <label className="block text-sm font-extrabold text-slate-700 mb-2">
                                 Vị Trí
                             </label>
                             <select
                                 value={selectedPosition}
                                 onChange={(e) => setSelectedPosition(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-dark"
+                                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold"
                             >
                                 <option value="all">Tất cả vị trí</option>
                                 {getPositions().map(position => (
@@ -214,13 +241,13 @@ const AdminApplications = () => {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            <label className="block text-sm font-extrabold text-slate-700 mb-2">
                                 Trạng Thái
                             </label>
                             <select
                                 value={selectedStatus}
                                 onChange={(e) => setSelectedStatus(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-dark"
+                                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold"
                             >
                                 <option value="all">Tất cả trạng thái</option>
                                 {statuses.map(status => (
@@ -231,72 +258,73 @@ const AdminApplications = () => {
                             </select>
                         </div>
                     </div>
-                </div>
+                    </AdminCardBody>
+                </AdminCard>
 
                 {/* Applications Table */}
-                <div className="bg-white rounded-lg shadow overflow-hidden">
-                    <table className="w-full">
-                        <thead className="bg-gray-100 border-b">
-                            <tr>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Họ Tên</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Vị Trí</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Email</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Số ĐT</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Trạng Thái</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Ngày Gửi</th>
-                                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">Hành Động</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredApplications.map(application => (
-                                <tr key={application._id} className="border-b hover:bg-gray-50">
-                                    <td className="px-6 py-4 text-sm text-gray-800">{application.fullName}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-800">{application.jobPosition}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-800">{application.email}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-800">{application.phone}</td>
-                                    <td className="px-6 py-4">
-                                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadge(application.status).color}`}>
-                                            {getStatusBadge(application.status).label}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-600">
-                                        {new Date(application.createdAt).toLocaleDateString('vi-VN')}
-                                    </td>
-                                    <td className="px-6 py-4 text-center">
-                                        <div className="flex justify-center gap-2">
-                                            <button
-                                                onClick={() => handleShowDetails(application)}
-                                                className="text-blue-600 hover:text-blue-800 transition"
-                                                title="Xem chi tiết"
-                                            >
-                                                <Eye size={18} />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDownload(application._id, application.resumePdf?.originalName)}
-                                                className="text-green-600 hover:text-green-800 transition"
-                                                title="Tải CV"
-                                            >
-                                                <Download size={18} />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(application._id)}
-                                                className="text-red-600 hover:text-red-800 transition"
-                                                title="Xóa"
-                                            >
-                                                <Trash2 size={18} />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    {filteredApplications.length === 0 && (
-                        <div className="px-6 py-8 text-center text-gray-500">
-                            Không có ứng tuyển nào
-                        </div>
-                    )}
-                </div>
+                <AdminTable
+                    emptyText="Không có ứng tuyển nào."
+                    columns={[
+                        { key: 'fullName', label: 'Họ tên' },
+                        { key: 'jobPosition', label: 'Vị trí' },
+                        { key: 'email', label: 'Email' },
+                        { key: 'phone', label: 'SĐT' },
+                        { key: 'status', label: 'Trạng thái' },
+                        { key: 'createdAt', label: 'Ngày gửi' },
+                        { key: 'actions', label: 'Hành động', className: 'text-right', tdClassName: 'text-right' },
+                    ]}
+                    rows={filteredApplications.map((application) => ({
+                        key: application._id,
+                        fullName: <span className="font-semibold text-slate-900">{application.fullName}</span>,
+                        jobPosition: <span className="font-semibold text-slate-700">{application.jobPosition}</span>,
+                        email: <span className="font-semibold text-slate-700">{application.email}</span>,
+                        phone: <span className="font-semibold text-slate-700">{application.phone}</span>,
+                        status: (
+                            <span className={`inline-flex px-3 py-1 rounded-full text-xs font-extrabold ${getStatusBadge(application.status).color}`}>
+                                {getStatusBadge(application.status).label}
+                            </span>
+                        ),
+                        createdAt: (
+                            <span className="text-sm font-semibold text-slate-600 whitespace-nowrap">
+                                {new Date(application.createdAt).toLocaleDateString('vi-VN')}
+                            </span>
+                        ),
+                        actions: (
+                            <div className="inline-flex items-center justify-end gap-2">
+                                <button
+                                    onClick={() => handleShowDetails(application)}
+                                    className="p-2 rounded-xl text-indigo-700 hover:bg-indigo-50 transition"
+                                    title="Xem chi tiết"
+                                >
+                                    <Eye size={18} />
+                                </button>
+                                <button
+                                    onClick={() => handleDownload(application._id, application.resumePdf?.originalName)}
+                                    className="p-2 rounded-xl text-emerald-700 hover:bg-emerald-50 transition"
+                                    title="Tải CV"
+                                >
+                                    <Download size={18} />
+                                </button>
+                                {application.certificatesPdf && (
+                                    <button
+                                        onClick={() => handleDownloadCertificates(application._id, application.certificatesPdf?.originalName)}
+                                        className="p-2 rounded-xl text-sky-700 hover:bg-sky-50 transition"
+                                        title="Tải IELTS/Chứng chỉ"
+                                    >
+                                        <Download size={18} />
+                                    </button>
+                                )}
+                                <button
+                                    onClick={() => handleDelete(application._id)}
+                                    className="p-2 rounded-xl text-rose-700 hover:bg-rose-50 transition"
+                                    title="Xóa"
+                                >
+                                    <Trash2 size={18} />
+                                </button>
+                            </div>
+                        ),
+                    }))}
+                />
 
                 {/* Details Modal */}
                 {showDetails && selectedApplication && (
@@ -357,6 +385,22 @@ const AdminApplications = () => {
                                         </button>
                                     ) : (
                                         <p className="text-gray-500">Không có file CV</p>
+                                    )}
+                                </div>
+
+                                {/* Certificates */}
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-800 mb-2">IELTS / Chứng Chỉ</h3>
+                                    {selectedApplication.certificatesPdf ? (
+                                        <button
+                                            onClick={() => handleDownloadCertificates(selectedApplication._id, selectedApplication.certificatesPdf.originalName)}
+                                            className="text-blue-600 hover:text-blue-800 underline flex items-center gap-2"
+                                        >
+                                            <Download size={18} />
+                                            Tải {selectedApplication.certificatesPdf.originalName || 'Chứng chỉ'}
+                                        </button>
+                                    ) : (
+                                        <p className="text-gray-500">Không có file chứng chỉ</p>
                                     )}
                                 </div>
 

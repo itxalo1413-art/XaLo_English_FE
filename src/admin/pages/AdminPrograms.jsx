@@ -3,6 +3,7 @@ import { Edit, Trash2, Plus } from 'lucide-react';
 import client from '../../api/client';
 import ProgramGroupForm from '../components/ProgramGroupForm';
 import ProgramTrackForm from '../components/ProgramTrackForm';
+import { AdminButton, AdminPageHeader, AdminTable } from '../components/ui/AdminUI';
 
 const AdminPrograms = () => {
     const [activeTab, setActiveTab] = useState('groups');
@@ -71,136 +72,86 @@ const AdminPrograms = () => {
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-800">
-                    Quản lý Chương trình học
-                </h1>
-                <button
-                    onClick={handleAddNew}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-colors"
-                >
-                    <Plus size={20} />
-                    Thêm {activeTab === 'groups' ? 'nhóm' : 'lộ trình'}
-                </button>
-            </div>
+            <AdminPageHeader
+                title="Chương trình học"
+                subtitle="Quản lý nhóm chương trình và lộ trình học (tracks)."
+                actions={
+                    <AdminButton onClick={handleAddNew}>
+                        <Plus size={18} />
+                        Thêm {activeTab === 'groups' ? 'nhóm' : 'lộ trình'}
+                    </AdminButton>
+                }
+            />
 
             {/* Tabs */}
-            <div className="flex gap-4 mb-6 border-b border-gray-200">
+            <div className="mb-6 flex gap-2 rounded-2xl border border-slate-200 bg-white p-2 w-fit">
                 <button
-                    className={`pb-2 px-4 font-medium ${activeTab === 'groups'
-                            ? 'text-blue-600 border-b-2 border-blue-600'
-                            : 'text-gray-500 hover:text-gray-700'
-                        }`}
+                    className={[
+                        'px-4 py-2 rounded-xl text-sm font-extrabold transition',
+                        activeTab === 'groups' ? 'bg-indigo-600 text-white' : 'text-slate-700 hover:bg-slate-50',
+                    ].join(' ')}
                     onClick={() => setActiveTab('groups')}
                 >
-                    Nhóm chương trình (Groups)
+                    Groups
                 </button>
                 <button
-                    className={`pb-2 px-4 font-medium ${activeTab === 'tracks'
-                            ? 'text-blue-600 border-b-2 border-blue-600'
-                            : 'text-gray-500 hover:text-gray-700'
-                        }`}
+                    className={[
+                        'px-4 py-2 rounded-xl text-sm font-extrabold transition',
+                        activeTab === 'tracks' ? 'bg-indigo-600 text-white' : 'text-slate-700 hover:bg-slate-50',
+                    ].join(' ')}
                     onClick={() => setActiveTab('tracks')}
                 >
-                    Lộ trình học (Tracks)
+                    Tracks
                 </button>
             </div>
 
             {loading ? (
-                <div>Loading...</div>
+                <div className="text-sm font-semibold text-slate-600">Loading...</div>
             ) : (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500 font-semibold">
-                                {activeTab === 'groups' ? (
-                                    <>
-                                        <th className="px-6 py-4">Tên nhóm</th>
-                                        <th className="px-6 py-4">Slug</th>
-                                        <th className="px-6 py-4">Thứ tự</th>
-                                    </>
-                                ) : (
-                                    <>
-                                        <th className="px-6 py-4">Tên lộ trình</th>
-                                        <th className="px-6 py-4">Thuộc nhóm</th>
-                                        <th className="px-6 py-4">Slug</th>
-                                        <th className="px-6 py-4">Thứ tự</th>
-                                    </>
-                                )}
-                                <th className="px-6 py-4 text-right">Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                            {activeTab === 'groups'
-                                ? groups.map((group) => (
-                                    <tr
-                                        key={group._id}
-                                        className="hover:bg-gray-50 transition-colors"
-                                    >
-                                        <td className="px-6 py-4 font-medium text-gray-800">
-                                            {group.name}
-                                        </td>
-                                        <td className="px-6 py-4 text-gray-600">{group.slug}</td>
-                                        <td className="px-6 py-4 text-gray-600">{group.order}</td>
-                                        <td className="px-6 py-4 text-right">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <button
-                                                    onClick={() => handleEdit(group)}
-                                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                >
-                                                    <Edit size={18} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(group._id)}
-                                                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                                : tracks.map((track) => (
-                                    <tr
-                                        key={track._id}
-                                        className="hover:bg-gray-50 transition-colors"
-                                    >
-                                        <td className="px-6 py-4 font-medium text-gray-800">
-                                            {track.name}
-                                        </td>
-                                        <td className="px-6 py-4 text-gray-600">
-                                            {track.group?.name || 'N/A'}
-                                        </td>
-                                        <td className="px-6 py-4 text-gray-600">{track.slug}</td>
-                                        <td className="px-6 py-4 text-gray-600">{track.order}</td>
-                                        <td className="px-6 py-4 text-right">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <button
-                                                    onClick={() => handleEdit(track)}
-                                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                >
-                                                    <Edit size={18} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(track._id)}
-                                                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            {(activeTab === 'groups' ? groups : tracks).length === 0 && (
-                                <tr>
-                                    <td colSpan="5" className="text-center py-8 text-gray-500">
-                                        No data found.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                <AdminTable
+                    emptyText="Chưa có dữ liệu."
+                    columns={
+                        activeTab === 'groups'
+                            ? [
+                                { key: 'name', label: 'Tên nhóm' },
+                                { key: 'slug', label: 'Slug' },
+                                { key: 'order', label: 'Thứ tự' },
+                                { key: 'actions', label: 'Hành động', className: 'text-right', tdClassName: 'text-right' },
+                            ]
+                            : [
+                                { key: 'name', label: 'Tên lộ trình' },
+                                { key: 'group', label: 'Thuộc nhóm' },
+                                { key: 'slug', label: 'Slug' },
+                                { key: 'order', label: 'Thứ tự' },
+                                { key: 'actions', label: 'Hành động', className: 'text-right', tdClassName: 'text-right' },
+                            ]
+                    }
+                    rows={(activeTab === 'groups' ? groups : tracks).map((item) => ({
+                        key: item._id,
+                        name: <div className="font-semibold text-slate-900">{item.name}</div>,
+                        slug: <span className="font-semibold text-slate-700">{item.slug}</span>,
+                        order: <span className="font-extrabold text-slate-700">{item.order}</span>,
+                        group: <span className="font-semibold text-slate-700">{item.group?.name || 'N/A'}</span>,
+                        actions: (
+                            <div className="inline-flex items-center justify-end gap-2">
+                                <button
+                                    onClick={() => handleEdit(item)}
+                                    className="p-2 rounded-xl text-indigo-700 hover:bg-indigo-50 transition"
+                                    title="Sửa"
+                                >
+                                    <Edit size={18} />
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(item._id)}
+                                    className="p-2 rounded-xl text-rose-700 hover:bg-rose-50 transition"
+                                    title="Xóa"
+                                >
+                                    <Trash2 size={18} />
+                                </button>
+                            </div>
+                        ),
+                    }))}
+                />
             )}
 
             {showGroupForm && (

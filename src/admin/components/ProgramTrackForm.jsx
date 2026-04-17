@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, Plus, Trash2 } from 'lucide-react';
 import client from '../../api/client';
 import StudentResultModal from '../../components/features/StudentResultModal';
+import { AdminButton, AdminField, AdminInput, AdminModal, AdminTextarea } from './ui/AdminUI';
 
 const ProgramTrackForm = ({ track, groups, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -231,197 +232,127 @@ const ProgramTrackForm = ({ track, groups, onClose, onSuccess }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                <div className="flex justify-between items-center p-6 border-b">
-                    <h2 className="text-xl font-bold text-gray-800">
-                        {track ? 'Edit Program Track' : 'Add Program Track'}
-                    </h2>
-                    <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-                        <X size={24} />
-                    </button>
+        <AdminModal
+            title={track ? 'Sửa Track' : 'Thêm Track'}
+            description="Cấu hình chi tiết lộ trình học hiển thị ở trang khóa học."
+            onClose={onClose}
+            footer={
+                <>
+                    <AdminButton variant="secondary" type="button" onClick={onClose}>
+                        Hủy
+                    </AdminButton>
+                    <AdminButton type="submit" form="program-track-form" disabled={uploading}>
+                        {uploading ? 'Đang lưu...' : track ? 'Cập nhật' : 'Tạo mới'}
+                    </AdminButton>
+                </>
+            }
+        >
+            <form id="program-track-form" onSubmit={handleSubmit} className="space-y-6">
+                {error ? (
+                    <div className="bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-2xl text-sm font-semibold">
+                        {error}
+                    </div>
+                ) : null}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <AdminField label="Program Group">
+                        <select
+                            name="group"
+                            value={formData.group}
+                            onChange={handleChange}
+                            className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold"
+                            required
+                        >
+                            <option value="">Select Group</option>
+                            {groups.map((g) => (
+                                <option key={g._id} value={g._id}>
+                                    {g.name}
+                                </option>
+                            ))}
+                        </select>
+                    </AdminField>
+
+                    <AdminField label="Track Name">
+                        <AdminInput name="name" value={formData.name} onChange={handleChange} required />
+                    </AdminField>
+
+                    <AdminField label="Slug">
+                        <AdminInput name="slug" value={formData.slug} onChange={handleChange} required />
+                    </AdminField>
+
+                    <AdminField label="Order">
+                        <AdminInput type="number" name="order" value={formData.order} onChange={handleChange} required />
+                    </AdminField>
+
+                    <AdminField label="Entry Band Text">
+                        <AdminInput name="entryBandText" value={formData.entryBandText} onChange={handleChange} />
+                    </AdminField>
+
+                    <AdminField label="Exit Band Text">
+                        <AdminInput name="exitBandText" value={formData.exitBandText} onChange={handleChange} />
+                    </AdminField>
+
+                    <AdminField label="Duration Text">
+                        <AdminInput name="durationText" value={formData.durationText} onChange={handleChange} />
+                    </AdminField>
+
+                    <AdminField label="Course Link (Optional)">
+                        <AdminInput
+                            name="courseLink"
+                            value={formData.courseLink}
+                            onChange={handleChange}
+                            placeholder="https://... hoặc /course-details/..."
+                        />
+                    </AdminField>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6">
-                    {error && (
-                        <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>
-                    )}
+                <AdminField label="Description">
+                    <AdminTextarea name="description" value={formData.description} onChange={handleChange} rows={4} />
+                </AdminField>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Program Group
-                            </label>
-                            <select
-                                name="group"
-                                value={formData.group}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                                required
-                            >
-                                <option value="">Select Group</option>
-                                {groups.map((g) => (
-                                    <option key={g._id} value={g._id}>
-                                        {g.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Track Name
-                            </label>
-                            <input
-                                type="text"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Slug
-                            </label>
-                            <input
-                                type="text"
-                                name="slug"
-                                value={formData.slug}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Order
-                            </label>
-                            <input
-                                type="number"
-                                name="order"
-                                value={formData.order}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Entry Band Text
-                            </label>
-                            <input
-                                type="text"
-                                name="entryBandText"
-                                value={formData.entryBandText}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Exit Band Text
-                            </label>
-                            <input
-                                type="text"
-                                name="exitBandText"
-                                value={formData.exitBandText}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Duration Text
-                            </label>
-                            <input
-                                type="text"
-                                name="durationText"
-                                value={formData.durationText}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Course Link (Optional)
-                            </label>
-                            <input
-                                type="text"
-                                name="courseLink"
-                                value={formData.courseLink}
-                                onChange={handleChange}
-                                placeholder="e.g., https://example.com or /custom-path"
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-                    </div>
-
-
-                    <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Detail Illustration Image
-                        </label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="w-full"
-                        />
-                        {formData.detailIllustrationUrl && !imageFile && (
+                <div className="border-t border-slate-200 pt-6">
+                    <AdminField label="Detail Illustration Image" hint="Upload ảnh minh hoạ cho trang chi tiết.">
+                        <input type="file" accept="image/*" onChange={handleImageChange} className="w-full text-sm font-semibold text-slate-600" />
+                        {formData.detailIllustrationUrl && !imageFile ? (
                             <img
                                 src={formData.detailIllustrationUrl}
                                 alt="Preview"
-                                className="mt-2 h-32 object-cover rounded"
+                                className="mt-3 h-40 w-auto object-cover rounded-2xl border border-slate-200"
                             />
-                        )}
-                    </div>
+                        ) : null}
+                    </AdminField>
+                </div>
 
                     {/* Target Audience Section */}
-                    <div className="mb-6 border-t pt-4">
+                    <div className="mt-6 border-t border-slate-200 pt-6">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-semibold text-gray-800">Target Audience</h3>
-                            <button
-                                type="button"
-                                onClick={addTargetAudience}
-                                className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"
-                            >
+                            <h3 className="text-base font-extrabold text-slate-900">Target Audience</h3>
+                            <AdminButton variant="secondary" type="button" onClick={addTargetAudience}>
                                 <Plus size={16} /> Add Audience
-                            </button>
+                            </AdminButton>
                         </div>
                         {formData.targetAudience.map((audience, index) => (
-                            <div key={index} className="bg-gray-50 p-4 rounded-lg mb-4 relative">
+                            <div key={index} className="bg-slate-50 p-4 rounded-2xl mb-4 relative border border-slate-200">
                                 <button
                                     type="button"
                                     onClick={() => removeTargetAudience(index)}
-                                    className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                                    className="absolute top-2 right-2 p-2 rounded-xl text-rose-700 hover:bg-rose-50"
                                 >
                                     <Trash2 size={16} />
                                 </button>
                                 <div className="mb-2">
-                                    <label className="block text-xs font-medium text-gray-500 uppercase">
-                                        Title
-                                    </label>
+                                    <label className="block text-xs font-extrabold text-slate-500 uppercase">Title</label>
                                     <input
                                         type="text"
                                         value={audience.title}
                                         onChange={(e) =>
                                             updateTargetAudience(index, 'title', e.target.value)
                                         }
-                                        className="w-full border border-gray-300 rounded px-2 py-1"
+                                        className="w-full border border-slate-200 rounded-xl px-3 py-2 font-semibold"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-medium text-gray-500 uppercase mb-1">
-                                        Bullets
-                                    </label>
+                                    <label className="block text-xs font-extrabold text-slate-500 uppercase mb-1">Bullets</label>
                                     {audience.bullets.map((bullet, bIndex) => (
                                         <div key={bIndex} className="flex gap-2 mb-1">
                                             <input
@@ -430,12 +361,12 @@ const ProgramTrackForm = ({ track, groups, onClose, onSuccess }) => {
                                                 onChange={(e) =>
                                                     updateAudienceBullet(index, bIndex, e.target.value)
                                                 }
-                                                className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+                                                className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold"
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() => removeAudienceBullet(index, bIndex)}
-                                                className="text-red-400 hover:text-red-600"
+                                                className="px-2 rounded-xl text-rose-600 hover:bg-rose-50"
                                             >
                                                 <X size={14} />
                                             </button>
@@ -444,7 +375,7 @@ const ProgramTrackForm = ({ track, groups, onClose, onSuccess }) => {
                                     <button
                                         type="button"
                                         onClick={() => addAudienceBullet(index)}
-                                        className="text-xs text-blue-600 hover:underline mt-1"
+                                        className="text-xs font-extrabold text-indigo-700 hover:underline mt-2"
                                     >
                                         + Add Bullet
                                     </button>
@@ -454,59 +385,49 @@ const ProgramTrackForm = ({ track, groups, onClose, onSuccess }) => {
                     </div>
 
                     {/* Syllabus Section */}
-                    <div className="mb-6 border-t pt-4">
+                    <div className="mt-6 border-t border-slate-200 pt-6">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-semibold text-gray-800">Syllabus</h3>
-                            <button
-                                type="button"
-                                onClick={addSyllabusItem}
-                                className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"
-                            >
+                            <h3 className="text-base font-extrabold text-slate-900">Syllabus</h3>
+                            <AdminButton variant="secondary" type="button" onClick={addSyllabusItem}>
                                 <Plus size={16} /> Add Syllabus Item
-                            </button>
+                            </AdminButton>
                         </div>
                         {formData.syllabusItems.map((item, index) => (
-                            <div key={index} className="bg-gray-50 p-4 rounded-lg mb-4 relative">
+                            <div key={index} className="bg-slate-50 p-4 rounded-2xl mb-4 relative border border-slate-200">
                                 <button
                                     type="button"
                                     onClick={() => removeSyllabusItem(index)}
-                                    className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                                    className="absolute top-2 right-2 p-2 rounded-xl text-rose-700 hover:bg-rose-50"
                                 >
                                     <Trash2 size={16} />
                                 </button>
                                 <div className="grid grid-cols-2 gap-4 mb-2">
                                     <div>
-                                        <label className="block text-xs font-medium text-gray-500 uppercase">
-                                            Code
-                                        </label>
+                                        <label className="block text-xs font-extrabold text-slate-500 uppercase">Code</label>
                                         <input
                                             type="text"
                                             value={item.code}
                                             onChange={(e) =>
                                                 updateSyllabusItem(index, 'code', e.target.value)
                                             }
-                                            className="w-full border border-gray-300 rounded px-2 py-1"
+                                            className="w-full border border-slate-200 rounded-xl px-3 py-2 font-semibold"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-medium text-gray-500 uppercase">
-                                            Title
-                                        </label>
+                                        <label className="block text-xs font-extrabold text-slate-500 uppercase">Title</label>
                                         <input
                                             type="text"
                                             value={item.title}
                                             onChange={(e) =>
                                                 updateSyllabusItem(index, 'title', e.target.value)
                                             }
-                                            className="w-full border border-gray-300 rounded px-2 py-1"
+                                            className="w-full border border-slate-200 rounded-xl px-3 py-2 font-semibold"
                                         />
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-medium text-gray-500 uppercase mb-1">
-                                        Bullets
-                                    </label>
+                                    <label className="block text-xs font-extrabold text-slate-500 uppercase mb-1">Bullets</label>
                                     {item.bullets.map((bullet, bIndex) => (
                                         <div key={bIndex} className="flex gap-2 mb-1">
                                             <input
@@ -515,12 +436,12 @@ const ProgramTrackForm = ({ track, groups, onClose, onSuccess }) => {
                                                 onChange={(e) =>
                                                     updateSyllabusBullet(index, bIndex, e.target.value)
                                                 }
-                                                className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+                                                className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold"
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() => removeSyllabusBullet(index, bIndex)}
-                                                className="text-red-400 hover:text-red-600"
+                                                className="px-2 rounded-xl text-rose-600 hover:bg-rose-50"
                                             >
                                                 <X size={14} />
                                             </button>
@@ -529,7 +450,7 @@ const ProgramTrackForm = ({ track, groups, onClose, onSuccess }) => {
                                     <button
                                         type="button"
                                         onClick={() => addSyllabusBullet(index)}
-                                        className="text-xs text-blue-600 hover:underline mt-1"
+                                        className="text-xs font-extrabold text-indigo-700 hover:underline mt-2"
                                     >
                                         + Add Bullet
                                     </button>
@@ -537,32 +458,14 @@ const ProgramTrackForm = ({ track, groups, onClose, onSuccess }) => {
                             </div>
                         ))}
                     </div>
-
-                    <div className="flex justify-end gap-4">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={uploading}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-                        >
-                            {uploading ? 'Uploading...' : track ? 'Update Track' : 'Create Track'}
-                        </button>
-                    </div>
-                </form >
-            </div >
+            </form>
 
             <StudentResultModal
-        isOpen={showResultModal}
-        onClose={() => setShowResultModal(false)}
-        result={selectedResult}
-      />
-        </div >
+                isOpen={showResultModal}
+                onClose={() => setShowResultModal(false)}
+                result={selectedResult}
+            />
+        </AdminModal>
     );
 };
 

@@ -4,6 +4,7 @@ import JobPositionForm from '../components/JobPositionForm';
 
 import client from '../../api/client';
 import Button from '../../components/common/Button';
+import { AdminButton, AdminPageHeader, AdminTable } from '../components/ui/AdminUI';
 
 const AdminJobPositions = () => {
     const [positions, setPositions] = useState([]);
@@ -123,121 +124,110 @@ const AdminJobPositions = () => {
     if (loading) {
         return (
             <div className="flex items-center justify-center py-10">
-                <div className="text-gray-600">Đang tải...</div>
+                <div className="text-slate-600 font-semibold">Đang tải...</div>
             </div>
         );
     }
 
     return (
         <div>
-            <div className="flex items-center justify-between mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-800">Quản lý công việc tuyển dụng</h1>
-                    <p className="text-gray-600 mt-1">Thêm, chỉnh sửa, xóa các vị trí công việc đang tuyển</p>
-                </div>
-                <Button
-                    onClick={() => handleOpenForm()}
-                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
-                >
-                    <Plus size={20} />
-                    Thêm công việc
-                </Button>
-            </div>
+            <AdminPageHeader
+                title="Công việc tuyển dụng"
+                subtitle="Thêm, chỉnh sửa, sắp xếp thứ tự hiển thị và trạng thái tuyển dụng."
+                actions={
+                    <AdminButton onClick={() => handleOpenForm()}>
+                        <Plus size={18} />
+                        Thêm công việc
+                    </AdminButton>
+                }
+            />
 
             {error && (
-                <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg mb-6">
+                <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl mb-6 font-semibold text-sm">
                     {error}
                 </div>
             )}
 
             {positions.length === 0 ? (
-                <div className="bg-white rounded-lg shadow-md p-8 text-center">
-                    <p className="text-gray-600 mb-4">Chưa có vị trí công việc nào</p>
-                    <Button onClick={() => handleOpenForm()} className="bg-blue-600">
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-10 text-center">
+                    <p className="text-slate-600 mb-4 font-semibold">Chưa có vị trí công việc nào</p>
+                    <AdminButton onClick={() => handleOpenForm()}>
                         Thêm công việc đầu tiên
-                    </Button>
+                    </AdminButton>
                 </div>
             ) : (
-                <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                    <table className="w-full">
-                        <thead className="bg-gray-50 border-b">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Thứ tự</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Tiêu đề</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Loại</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Mức lương</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Địa điểm</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Trạng thái</th>
-                                <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {positions.map((position, index) => (
-                                <tr key={position._id} className="border-b hover:bg-gray-50">
-                                    <td className="px-6 py-4 text-sm text-gray-800">
-                                        {Number.isFinite(Number(position.displayOrder)) ? Number(position.displayOrder) : 0}
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div>
-                                            <p className="font-medium text-gray-800">{position.title}</p>
-                                            <p className="text-sm text-gray-600 line-clamp-1">{position.description}</p>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getTypeColor(position.type)}`}>
-                                            {position.type}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-800">
-                                        {position.salary || 'Thương lượng'}
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-800">
-                                        {position.location}
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(position.isActive)}`}>
-                                            {position.isActive ? 'Đang tuyển' : 'Dừng tuyển'}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-center">
-                                        <div className="flex justify-center gap-2">
-                                            <button
-                                                onClick={() => movePosition(index, 'up')}
-                                                className="text-gray-600 hover:text-gray-900 transition disabled:opacity-30 disabled:cursor-not-allowed"
-                                                title="Đưa lên"
-                                                disabled={index === 0}
-                                            >
-                                                ↑
-                                            </button>
-                                            <button
-                                                onClick={() => movePosition(index, 'down')}
-                                                className="text-gray-600 hover:text-gray-900 transition disabled:opacity-30 disabled:cursor-not-allowed"
-                                                title="Đưa xuống"
-                                                disabled={index === positions.length - 1}
-                                            >
-                                                ↓
-                                            </button>
-                                            <button
-                                                onClick={() => handleOpenForm(position)}
-                                                className="text-blue-600 hover:text-blue-800 transition"
-                                                title="Chỉnh sửa"
-                                            >
-                                                <Edit size={18} />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(position._id)}
-                                                className="text-red-600 hover:text-red-800 transition"
-                                                title="Xóa"
-                                            >
-                                                <Trash2 size={18} />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                <AdminTable
+                    emptyText="Không có dữ liệu."
+                    columns={[
+                        { key: 'order', label: 'Thứ tự' },
+                        { key: 'title', label: 'Tiêu đề' },
+                        { key: 'type', label: 'Loại' },
+                        { key: 'salary', label: 'Mức lương' },
+                        { key: 'location', label: 'Địa điểm' },
+                        { key: 'status', label: 'Trạng thái' },
+                        { key: 'actions', label: 'Hành động', className: 'text-right', tdClassName: 'text-right' },
+                    ]}
+                    rows={positions.map((position, index) => ({
+                        key: position._id,
+                        order: (
+                            <span className="font-extrabold text-slate-800">
+                                {Number.isFinite(Number(position.displayOrder)) ? Number(position.displayOrder) : 0}
+                            </span>
+                        ),
+                        title: (
+                            <div className="min-w-0">
+                                <p className="font-semibold text-slate-900">{position.title}</p>
+                                <p className="text-sm text-slate-600 line-clamp-1">{position.description}</p>
+                            </div>
+                        ),
+                        type: (
+                            <span className={`inline-flex px-3 py-1 rounded-full text-xs font-extrabold ${getTypeColor(position.type)}`}>
+                                {position.type}
+                            </span>
+                        ),
+                        salary: <span className="font-semibold text-slate-700">{position.salary || 'Thương lượng'}</span>,
+                        location: <span className="font-semibold text-slate-700">{position.location}</span>,
+                        status: (
+                            <span className={`inline-flex px-3 py-1 rounded-full text-xs font-extrabold ${getStatusColor(position.isActive)}`}>
+                                {position.isActive ? 'Đang tuyển' : 'Dừng tuyển'}
+                            </span>
+                        ),
+                        actions: (
+                            <div className="inline-flex items-center justify-end gap-2">
+                                <button
+                                    onClick={() => movePosition(index, 'up')}
+                                    className="p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                                    title="Đưa lên"
+                                    disabled={index === 0}
+                                >
+                                    ↑
+                                </button>
+                                <button
+                                    onClick={() => movePosition(index, 'down')}
+                                    className="p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                                    title="Đưa xuống"
+                                    disabled={index === positions.length - 1}
+                                >
+                                    ↓
+                                </button>
+                                <button
+                                    onClick={() => handleOpenForm(position)}
+                                    className="p-2 rounded-xl text-indigo-700 hover:bg-indigo-50 transition"
+                                    title="Chỉnh sửa"
+                                >
+                                    <Edit size={18} />
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(position._id)}
+                                    className="p-2 rounded-xl text-rose-700 hover:bg-rose-50 transition"
+                                    title="Xóa"
+                                >
+                                    <Trash2 size={18} />
+                                </button>
+                            </div>
+                        ),
+                    }))}
+                />
             )}
 
             {showForm && (

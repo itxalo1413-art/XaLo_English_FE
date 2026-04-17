@@ -12,6 +12,11 @@ const jobApplicationSchema = mongoose.Schema(
             path: { type: String },
             originalName: { type: String },
         },
+        certificatesPdf: {
+            filename: { type: String },
+            path: { type: String },
+            originalName: { type: String },
+        },
         status: {
             type: String,
             enum: ['new', 'reviewing', 'shortlisted', 'rejected', 'hired'],

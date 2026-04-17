@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import client from '../../api/client';
+import { AdminButton, AdminField, AdminInput, AdminModal, AdminTextarea } from './ui/AdminUI';
 
 const TestimonialForm = ({ testimonial, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -86,103 +87,52 @@ const TestimonialForm = ({ testimonial, onClose, onSuccess }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-                <div className="flex justify-between items-center p-6 border-b">
-                    <h2 className="text-xl font-bold text-gray-800">
-                        {testimonial ? 'Edit Testimonial' : 'Add New Testimonial'}
-                    </h2>
-                    <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-                        <X size={24} />
-                    </button>
-                </div>
+        <AdminModal
+            title={testimonial ? 'Sửa Testimonial' : 'Thêm Testimonial'}
+            description="Cảm nhận học viên hiển thị ở trang Home/Results."
+            onClose={onClose}
+            footer={
+                <>
+                    <AdminButton variant="secondary" type="button" onClick={onClose}>
+                        Hủy
+                    </AdminButton>
+                    <AdminButton type="submit" form="testimonial-form" disabled={uploading}>
+                        {uploading ? 'Đang lưu...' : testimonial ? 'Cập nhật' : 'Tạo mới'}
+                    </AdminButton>
+                </>
+            }
+        >
+            <form id="testimonial-form" onSubmit={handleSubmit} className="space-y-5">
+                {error ? (
+                    <div className="bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-2xl text-sm font-semibold">
+                        {error}
+                    </div>
+                ) : null}
 
-                <form onSubmit={handleSubmit} className="p-6">
-                    {error && (
-                        <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>
-                    )}
+                <AdminField label="Student Name">
+                    <AdminInput name="student_name" value={formData.student_name} onChange={handleChange} required />
+                </AdminField>
 
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Student Name
-                        </label>
-                        <input
-                            type="text"
-                            name="student_name"
-                            value={formData.student_name}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            required
+                <AdminField label="Score Achieved" hint="Ví dụ: IELTS 8.0">
+                    <AdminInput name="score_achieved" value={formData.score_achieved} onChange={handleChange} required />
+                </AdminField>
+
+                <AdminField label="Testimonial Text">
+                    <AdminTextarea name="testimonial_text" value={formData.testimonial_text} onChange={handleChange} rows={3} required />
+                </AdminField>
+
+                <AdminField label="Certificate Image">
+                    <input type="file" accept="image/*" onChange={handleImageChange} className="w-full text-sm font-semibold text-slate-600" />
+                    {formData.certificate_image_url && !imageFile ? (
+                        <img
+                            src={formData.certificate_image_url}
+                            alt="Preview"
+                            className="mt-3 h-40 w-auto object-cover rounded-2xl border border-slate-200"
                         />
-                    </div>
-
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Score Achieved
-                        </label>
-                        <input
-                            type="text"
-                            name="score_achieved"
-                            value={formData.score_achieved}
-                            onChange={handleChange}
-                            placeholder="e.g. IELTS 8.0"
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            required
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Testimonial Text
-                        </label>
-                        <textarea
-                            name="testimonial_text"
-                            value={formData.testimonial_text}
-                            onChange={handleChange}
-                            rows="3"
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            required
-                        ></textarea>
-                    </div>
-
-                    <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Certificate Image
-                        </label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="w-full"
-                        />
-                        {formData.certificate_image_url && !imageFile && (
-                            <img
-                                src={formData.certificate_image_url}
-                                alt="Preview"
-                                className="mt-2 h-32 object-cover rounded"
-                            />
-                        )}
-                    </div>
-
-                    <div className="flex justify-end gap-4">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={uploading}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-                        >
-                            {uploading ? 'Uploading...' : testimonial ? 'Update Testimonial' : 'Create Testimonial'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                    ) : null}
+                </AdminField>
+            </form>
+        </AdminModal>
     );
 };
 

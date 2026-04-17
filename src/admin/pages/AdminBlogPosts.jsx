@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Edit, Trash2, Plus } from 'lucide-react';
 import client from '../../api/client';
 import BlogPostForm from '../components/BlogPostForm';
+import { AdminButton, AdminPageHeader, AdminTable } from '../components/ui/AdminUI';
 
 const AdminBlogPosts = () => {
     const [posts, setPosts] = useState([]);
@@ -54,79 +55,71 @@ const AdminBlogPosts = () => {
         fetchPosts(page);
     };
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <div className="text-sm font-semibold text-slate-600">Loading...</div>;
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-800">Quản lý Tin tức (Blog Posts)</h1>
-                <button
-                    onClick={handleAddNew}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-colors"
-                >
-                    <Plus size={20} />
-                    Thêm bài viết
-                </button>
-            </div>
+            <AdminPageHeader
+                title="Tin tức"
+                subtitle="Quản lý bài viết hiển thị ở trang News."
+                actions={
+                    <AdminButton onClick={handleAddNew}>
+                        <Plus size={18} />
+                        Thêm bài viết
+                    </AdminButton>
+                }
+            />
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <table className="w-full text-left border-collapse">
-                    <thead>
-                        <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500 font-semibold">
-                            <th className="px-6 py-4">Tiêu đề</th>
-                            <th className="px-6 py-4">Ngày tạo</th>
-                            <th className="px-6 py-4 text-right">Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {posts.map((post) => (
-                            <tr key={post._id} className="hover:bg-gray-50 transition-colors">
-                                <td className="px-6 py-4 font-medium text-gray-800">
-                                    {post.title}
-                                </td>
-                                <td className="px-6 py-4 text-gray-600">
-                                    {new Date(post.createdAt).toLocaleDateString('vi-VN')}
-                                </td>
-                                <td className="px-6 py-4 text-right">
-                                    <div className="flex items-center justify-end gap-2">
-                                        <button
-                                            onClick={() => handleEdit(post)}
-                                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                        >
-                                            <Edit size={18} />
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(post._id)}
-                                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                        {posts.length === 0 && (
-                            <tr>
-                                <td colSpan="3" className="text-center py-8 text-gray-500">
-                                    No blog posts found.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
+            <AdminTable
+                emptyText="Chưa có bài viết nào."
+                columns={[
+                    { key: 'title', label: 'Tiêu đề' },
+                    { key: 'slug', label: 'Slug' },
+                    { key: 'createdAt', label: 'Ngày tạo' },
+                    { key: 'actions', label: 'Hành động', className: 'text-right', tdClassName: 'text-right' },
+                ]}
+                rows={posts.map((post) => ({
+                    key: post._id,
+                    title: <div className="font-semibold text-slate-900">{post.title}</div>,
+                    slug: <span className="font-semibold text-slate-700">{post.slug}</span>,
+                    createdAt: (
+                        <span className="text-sm font-semibold text-slate-600 whitespace-nowrap">
+                            {new Date(post.createdAt).toLocaleDateString('vi-VN')}
+                        </span>
+                    ),
+                    actions: (
+                        <div className="inline-flex items-center justify-end gap-2">
+                            <button
+                                onClick={() => handleEdit(post)}
+                                className="p-2 rounded-xl text-indigo-700 hover:bg-indigo-50 transition"
+                                title="Sửa"
+                            >
+                                <Edit size={18} />
+                            </button>
+                            <button
+                                onClick={() => handleDelete(post._id)}
+                                className="p-2 rounded-xl text-rose-700 hover:bg-rose-50 transition"
+                                title="Xóa"
+                            >
+                                <Trash2 size={18} />
+                            </button>
+                        </div>
+                    ),
+                }))}
+            />
 
-            {/* Pagination */}
             {pages > 1 && (
                 <div className="flex justify-center mt-6 gap-2">
                     {[...Array(pages).keys()].map((x) => (
                         <button
                             key={x + 1}
                             onClick={() => fetchPosts(x + 1)}
-                            className={`px-3 py-1 rounded ${page === x + 1
-                                    ? 'bg-blue-600 text-white'
-                                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                                }`}
+                            className={[
+                                'px-3 py-2 rounded-xl text-sm font-extrabold border transition',
+                                page === x + 1
+                                    ? 'bg-indigo-600 text-white border-indigo-600'
+                                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50',
+                            ].join(' ')}
                         >
                             {x + 1}
                         </button>

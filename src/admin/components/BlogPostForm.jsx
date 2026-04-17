@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
 import client from '../../api/client';
 import RichTextEditor from './RichTextEditor';
+import { AdminButton, AdminField, AdminInput, AdminModal, AdminTextarea } from './ui/AdminUI';
 
 const BlogPostForm = ({ post, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -87,102 +87,62 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                <div className="flex justify-between items-center p-6 border-b">
-                    <h2 className="text-xl font-bold text-gray-800">
-                        {post ? 'Edit Blog Post' : 'Add New Blog Post'}
-                    </h2>
-                    <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-                        <X size={24} />
-                    </button>
+        <AdminModal
+            title={post ? 'Sửa bài viết' : 'Thêm bài viết'}
+            description="Quản lý tin tức hiển thị ở trang News."
+            onClose={onClose}
+            footer={
+                <>
+                    <AdminButton variant="secondary" type="button" onClick={onClose}>
+                        Hủy
+                    </AdminButton>
+                    <AdminButton type="submit" form="blog-post-form" disabled={uploading}>
+                        {uploading ? 'Đang lưu...' : post ? 'Cập nhật' : 'Tạo mới'}
+                    </AdminButton>
+                </>
+            }
+        >
+            <form id="blog-post-form" onSubmit={handleSubmit} className="space-y-5">
+                {error ? (
+                    <div className="bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-2xl text-sm font-semibold">
+                        {error}
+                    </div>
+                ) : null}
+
+                <AdminField label="Title">
+                    <AdminInput name="title" value={formData.title} onChange={handleChange} required />
+                </AdminField>
+
+                <AdminField label="Excerpt">
+                    <AdminTextarea name="excerpt" value={formData.excerpt} onChange={handleChange} rows={3} />
+                </AdminField>
+
+                <div>
+                    <div className="text-sm font-extrabold text-slate-700 mb-2">Content</div>
+                    <RichTextEditor
+                        value={formData.contentHtml}
+                        onChange={(data) => setFormData((prev) => ({ ...prev, contentHtml: data }))}
+                        placeholder="Write your blog post content here..."
+                    />
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6">
-                    {error && (
-                        <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>
-                    )}
-
-                    <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Title
-                        </label>
-                        <input
-                            type="text"
-                            name="title"
-                            value={formData.title}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            required
+                <AdminField label="Cover Image">
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="w-full text-sm font-semibold text-slate-600"
+                    />
+                    {formData.coverImageUrl && !imageFile ? (
+                        <img
+                            src={formData.coverImageUrl}
+                            alt="Preview"
+                            className="mt-3 h-40 w-auto object-cover rounded-2xl border border-slate-200"
                         />
-                    </div>
-
-                    <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Excerpt
-                        </label>
-                        <textarea
-                            name="excerpt"
-                            value={formData.excerpt}
-                            onChange={handleChange}
-                            rows="3"
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                        ></textarea>
-                    </div>
-
-
-
-                    <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Content (HTML/Markdown)
-                        </label>
-                        <RichTextEditor
-                            value={formData.contentHtml}
-                            onChange={(data) =>
-                                setFormData((prev) => ({ ...prev, contentHtml: data }))
-                            }
-                            placeholder="Write your blog post content here..."
-                        />
-                    </div>
-
-                    <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Cover Image
-                        </label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="w-full"
-                        />
-                        {formData.coverImageUrl && !imageFile && (
-                            <img
-                                src={formData.coverImageUrl}
-                                alt="Preview"
-                                className="mt-2 h-32 object-cover rounded"
-                            />
-                        )}
-                    </div>
-
-                    <div className="flex justify-end gap-4">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={uploading}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-                        >
-                            {uploading ? 'Uploading...' : post ? 'Update Post' : 'Create Post'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                    ) : null}
+                </AdminField>
+            </form>
+        </AdminModal>
     );
 };
 

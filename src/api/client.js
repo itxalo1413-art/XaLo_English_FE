@@ -29,4 +29,24 @@ client.interceptors.request.use(
     }
 );
 
+// Auto logout on unauthorized
+client.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        const status = error?.response?.status;
+        if (status === 401) {
+            try {
+                localStorage.removeItem('userInfo');
+            } catch {
+                // ignore
+            }
+            // If currently in admin, bounce to login
+            if (typeof window !== 'undefined' && window.location?.pathname?.startsWith('/admin')) {
+                window.location.href = '/admin/login';
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
 export default client;

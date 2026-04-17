@@ -14,11 +14,24 @@ const createJobApplication = asyncHandler(async (req, res) => {
         throw new Error('Please provide all required fields');
     }
 
-    const resumePdf = req.file ? {
-        filename: req.file.filename,
-        path: `/uploads/applications/${req.file.filename}`,
-        originalName: req.file.originalname
-    } : null;
+    const resumeFile = req.files?.resumePdf?.[0];
+    const certificatesFile = req.files?.certificatesPdf?.[0];
+
+    const resumePdf = resumeFile
+        ? {
+              filename: resumeFile.filename,
+              path: `/uploads/applications/${resumeFile.filename}`,
+              originalName: resumeFile.originalname,
+          }
+        : null;
+
+    const certificatesPdf = certificatesFile
+        ? {
+              filename: certificatesFile.filename,
+              path: `/uploads/applications/${certificatesFile.filename}`,
+              originalName: certificatesFile.originalname,
+          }
+        : null;
 
     const jobApplication = new JobApplication({
         fullName,
@@ -27,6 +40,7 @@ const createJobApplication = asyncHandler(async (req, res) => {
         jobPosition,
         coverLetter,
         resumePdf,
+        certificatesPdf,
     });
 
     const createdApplication = await jobApplication.save();

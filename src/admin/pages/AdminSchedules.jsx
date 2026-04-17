@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import client from '../../api/client';
 import { Plus, Trash2, Calendar, Pencil, X, GripVertical, ArrowUp, ArrowDown } from 'lucide-react';
+import { AdminButton, AdminCard, AdminCardBody, AdminPageHeader } from '../components/ui/AdminUI';
 
 const AdminSchedules = () => {
     const [schedules, setSchedules] = useState([]);
@@ -196,102 +197,109 @@ const AdminSchedules = () => {
     };
 
     return (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold mb-6">Manage Schedules</h1>
+        <div>
+            <AdminPageHeader
+                title="Lịch khai giảng"
+                subtitle="Tạo lịch theo tháng, upload nhiều ảnh và sắp xếp thứ tự."
+            />
 
             {/* Create Form */}
-            <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-                <h2 className="text-lg font-semibold mb-4">Thêm lịch khai giảng mới</h2>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Tháng</label>
-                            <input
-                                type="month"
-                                value={month}
-                                onChange={(e) => setMonth(e.target.value)}
-                                className="w-full border border-gray-300 rounded px-3 py-2"
-                                required
-                            />
+            <AdminCard className="mb-8">
+                <AdminCardBody>
+                    <h2 className="text-base font-extrabold text-slate-900 mb-4">Thêm lịch khai giảng mới</h2>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                            <div>
+                                <label className="block text-sm font-extrabold text-slate-700 mb-2">Tháng</label>
+                                <input
+                                    type="month"
+                                    value={month}
+                                    onChange={(e) => setMonth(e.target.value)}
+                                    className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-extrabold text-slate-700 mb-2">Tiêu đề (tuỳ chọn)</label>
+                                <input
+                                    type="text"
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    placeholder="VD: Lịch khai giảng đợt 1"
+                                    className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-extrabold text-slate-700 mb-2">Hình ảnh (chọn nhiều)</label>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    onChange={handleImageChange}
+                                    className="w-full text-sm font-semibold text-slate-600"
+                                    required
+                                />
+                                {imageFiles?.length ? (
+                                    <div className="mt-2 text-xs font-semibold text-slate-500">{imageFiles.length} file(s) selected</div>
+                                ) : null}
+                            </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Tiêu đề (Tùy chọn)</label>
-                            <input
-                                type="text"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                placeholder="e.g. Lịch khai giảng đợt 1"
-                                className="w-full border border-gray-300 rounded px-3 py-2"
-                            />
+                            <AdminButton type="submit" disabled={uploading}>
+                                <Plus size={18} />
+                                {uploading ? 'Đang tải...' : 'Thêm lịch'}
+                            </AdminButton>
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Hình ảnh (Chọn nhiều)</label>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                multiple
-                                onChange={handleImageChange}
-                                className="w-full"
-                                required
-                            />
-                        </div>
-                    </div>
-                    <button
-                        type="submit"
-                        disabled={uploading}
-                        className="bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark disabled:opacity-50 flex items-center gap-2"
-                    >
-                        {uploading ? 'Đang tải...' : <><Plus size={18} /> Thêm lịch</>}
-                    </button>
-                </form>
-            </div>
+                    </form>
+                </AdminCardBody>
+            </AdminCard>
 
             {/* List */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                    <thead className="bg-slate-50 border-b border-slate-200">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hình ảnh</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tháng</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tiêu đề</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
+                            <th className="px-6 py-3 text-left text-xs font-extrabold text-slate-500 uppercase tracking-wider">Hình ảnh</th>
+                            <th className="px-6 py-3 text-left text-xs font-extrabold text-slate-500 uppercase tracking-wider">Tháng</th>
+                            <th className="px-6 py-3 text-left text-xs font-extrabold text-slate-500 uppercase tracking-wider">Tiêu đề</th>
+                            <th className="px-6 py-3 text-right text-xs font-extrabold text-slate-500 uppercase tracking-wider">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                         {schedules.map((schedule) => (
-                            <tr key={schedule._id}>
+                            <tr key={schedule._id} className="hover:bg-slate-50/60 transition-colors">
                                 <td className="px-6 py-4">
                                     <div className="flex gap-2 overflow-x-auto max-w-xs">
                                         {Array.isArray(schedule.scheduleImgURL) ? (
                                             schedule.scheduleImgURL.map((url, idx) => (
-                                                <img key={idx} src={url} alt={`Schedule ${idx}`} className="h-16 w-auto object-cover rounded flex-shrink-0" />
+                                                <img key={idx} src={url} alt={`Schedule ${idx}`} className="h-16 w-auto object-cover rounded-xl border border-slate-200 flex-shrink-0" />
                                             ))
                                         ) : (
-                                            <img src={schedule.scheduleImgURL} alt="Schedule" className="h-16 w-auto object-cover rounded" />
+                                            <img src={schedule.scheduleImgURL} alt="Schedule" className="h-16 w-auto object-cover rounded-xl border border-slate-200" />
                                         )}
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="flex items-center gap-2">
-                                        <Calendar size={16} className="text-gray-400" />
-                                        <span className="font-medium">{formatMonth(schedule.month)}</span>
+                                        <Calendar size={16} className="text-slate-400" />
+                                        <span className="font-extrabold text-slate-900">{formatMonth(schedule.month)}</span>
                                     </div>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {schedule.title || '-'}
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-700 font-semibold">
+                                    {schedule.title || <span className="text-slate-400">-</span>}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div className="flex items-center justify-end gap-3">
                                         <button
                                             onClick={() => openEditModal(schedule)}
-                                            className="text-blue-600 hover:text-blue-900"
+                                            className="p-2 rounded-xl text-indigo-700 hover:bg-indigo-50 transition"
                                             title="Chỉnh sửa"
                                         >
                                             <Pencil size={18} />
                                         </button>
                                         <button
                                             onClick={() => handleDelete(schedule._id)}
-                                            className="text-red-600 hover:text-red-900"
+                                            className="p-2 rounded-xl text-rose-700 hover:bg-rose-50 transition"
                                             title="Xóa"
                                         >
                                             <Trash2 size={18} />
@@ -302,7 +310,7 @@ const AdminSchedules = () => {
                         ))}
                         {schedules.length === 0 && !loading && (
                             <tr>
-                                <td colSpan="4" className="px-6 py-4 text-center text-gray-500">
+                                <td colSpan="4" className="px-6 py-10 text-center text-slate-500 font-semibold">
                                     Chưa có lịch nào. Thêm mới ở trên.
                                 </td>
                             </tr>
@@ -314,11 +322,11 @@ const AdminSchedules = () => {
             {/* Edit Modal */}
             {editingSchedule && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-slate-200">
                         {/* Header */}
                         <div className="flex items-center justify-between p-6 border-b">
-                            <h2 className="text-xl font-bold">Chỉnh sửa lịch khai giảng</h2>
-                            <button onClick={closeEditModal} className="text-gray-400 hover:text-gray-600">
+                            <h2 className="text-xl font-extrabold text-slate-900">Chỉnh sửa lịch khai giảng</h2>
+                            <button onClick={closeEditModal} className="p-2 rounded-xl text-slate-500 hover:bg-slate-100">
                                 <X size={24} />
                             </button>
                         </div>
@@ -327,23 +335,23 @@ const AdminSchedules = () => {
                             {/* Title & Month */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Tháng</label>
+                                    <label className="block text-sm font-extrabold text-slate-700 mb-2">Tháng</label>
                                     <input
                                         type="month"
                                         value={editMonth}
                                         onChange={(e) => setEditMonth(e.target.value)}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Tiêu đề</label>
+                                    <label className="block text-sm font-extrabold text-slate-700 mb-2">Tiêu đề</label>
                                     <input
                                         type="text"
                                         value={editTitle}
                                         onChange={(e) => setEditTitle(e.target.value)}
                                         placeholder="e.g. Lịch khai giảng đợt 1"
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold"
                                     />
                                 </div>
                             </div>
@@ -427,20 +435,19 @@ const AdminSchedules = () => {
 
                             {/* Submit */}
                             <div className="flex justify-end gap-3 pt-4 border-t">
-                                <button
+                                <AdminButton
                                     type="button"
                                     onClick={closeEditModal}
-                                    className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                                    variant="secondary"
                                 >
                                     Hủy
-                                </button>
-                                <button
+                                </AdminButton>
+                                <AdminButton
                                     type="submit"
                                     disabled={editUploading}
-                                    className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50"
                                 >
                                     {editUploading ? 'Đang lưu...' : 'Lưu thay đổi'}
-                                </button>
+                                </AdminButton>
                             </div>
                         </form>
                     </div>

@@ -16,6 +16,7 @@ const ApplicationForm = ({ jobPosition, isOpen, onClose }) => {
         coverLetter: '',
     });
     const [pdfFile, setPdfFile] = useState(null);
+    const [certificatesPdfFile, setCertificatesPdfFile] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
@@ -44,6 +45,22 @@ const ApplicationForm = ({ jobPosition, isOpen, onClose }) => {
             setPdfFile(file);
             setError('');
         }
+    };
+
+    const handleCertificatesPdfChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (file.type !== 'application/pdf') {
+            setError('Vui lòng chọn tệp PDF');
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            setError('Kích thước tệp không được vượt quá 5MB');
+            return;
+        }
+        setCertificatesPdfFile(file);
+        setError('');
     };
 
 
@@ -84,6 +101,9 @@ const ApplicationForm = ({ jobPosition, isOpen, onClose }) => {
             formDataToSend.append('jobPosition', jobPosition);
             formDataToSend.append('coverLetter', formData.coverLetter);
             formDataToSend.append('resumePdf', pdfFile);
+            if (certificatesPdfFile) {
+                formDataToSend.append('certificatesPdf', certificatesPdfFile);
+            }
 
             // Submit application with file
             const response = await apiClient.post('/job-applications', formDataToSend, {
@@ -99,6 +119,7 @@ const ApplicationForm = ({ jobPosition, isOpen, onClose }) => {
                     coverLetter: '',
                 });
                 setPdfFile(null);
+                setCertificatesPdfFile(null);
 
                 // Close modal after 2 seconds
                 setTimeout(() => {
@@ -220,10 +241,36 @@ const ApplicationForm = ({ jobPosition, isOpen, onClose }) => {
                             </div>
                         </div>
 
+                        {/* Certificates Upload (Optional) */}
+                        <div>
+                            <label className="block text-sm font-semibold text-primary-dark mb-2">
+                                IELTS / Chứng chỉ liên quan (PDF) <span className="text-gray-500 font-normal">(không bắt buộc)</span>
+                            </label>
+                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary-dark transition">
+                                <input
+                                    type="file"
+                                    accept=".pdf"
+                                    onChange={handleCertificatesPdfChange}
+                                    className="hidden"
+                                    id="certificates-pdf-upload"
+                                    disabled={uploading}
+                                />
+                                <label htmlFor="certificates-pdf-upload" className="cursor-pointer">
+                                    <div className="text-4xl text-gray-400 mb-2">📄</div>
+                                    <p className="text-primary-dark font-semibold mb-1">
+                                        {certificatesPdfFile ? certificatesPdfFile.name : 'Chọn tệp PDF'}
+                                    </p>
+                                    <p className="text-sm text-gray-500">
+                                        hoặc kéo thả tệp vào đây (Max 5MB)
+                                    </p>
+                                </label>
+                            </div>
+                        </div>
+
                         {/* Cover Letter */}
                         <div>
                             <label className="block text-sm font-semibold text-primary-dark mb-2">
-                                Dư Luận (Cover Letter) *
+                                Cover Letter *
                             </label>
                             <textarea
                                 name="coverLetter"

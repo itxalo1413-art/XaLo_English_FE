@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Edit, Trash2, Plus } from 'lucide-react';
 import client from '../../api/client';
 import StudentResultForm from '../components/StudentResultForm';
+import { AdminButton, AdminPageHeader, AdminTable } from '../components/ui/AdminUI';
 
 const AdminStudentResults = () => {
     const [results, setResults] = useState([]);
@@ -50,73 +51,60 @@ const AdminStudentResults = () => {
         fetchResults();
     };
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <div className="text-sm font-semibold text-slate-600">Loading...</div>;
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-800">
-                    Quản lý Kết quả học viên (Student Results)
-                </h1>
-                <button
-                    onClick={handleAddNew}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-colors"
-                >
-                    <Plus size={20} />
-                    Thêm kết quả
-                </button>
-            </div>
+            <AdminPageHeader
+                title="Kết quả học viên"
+                subtitle="Quản lý bảng vàng học viên (Student Results)."
+                actions={
+                    <AdminButton onClick={handleAddNew}>
+                        <Plus size={18} />
+                        Thêm kết quả
+                    </AdminButton>
+                }
+            />
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <table className="w-full text-left border-collapse">
-                    <thead>
-                        <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500 font-semibold">
-                            <th className="px-6 py-4">Học viên</th>
-                            <th className="px-6 py-4">Lớp</th>
-                            <th className="px-6 py-4">Overall</th>
-                            <th className="px-6 py-4">Input</th>
-                            <th className="px-6 py-4 text-right">Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {results.map((result) => (
-                            <tr key={result._id} className="hover:bg-gray-50 transition-colors">
-                                <td className="px-6 py-4 font-medium text-gray-800">
-                                    {result.name}
-                                </td>
-                                <td className="px-6 py-4 text-gray-600">{result.className}</td>
-                                <td className="px-6 py-4 text-gray-600 font-bold">
-                                    {Number(result.overall).toFixed(1)}
-                                </td>
-                                <td className="px-6 py-4 text-gray-600">{result.inputScore}</td>
-                                <td className="px-6 py-4 text-right">
-                                    <div className="flex items-center justify-end gap-2">
-                                        <button
-                                            onClick={() => handleEdit(result)}
-                                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                        >
-                                            <Edit size={18} />
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(result._id)}
-                                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                        {results.length === 0 && (
-                            <tr>
-                                <td colSpan="5" className="text-center py-8 text-gray-500">
-                                    No student results found.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
+            <AdminTable
+                emptyText="Chưa có kết quả nào."
+                columns={[
+                    { key: 'student', label: 'Học viên' },
+                    { key: 'className', label: 'Lớp' },
+                    { key: 'overall', label: 'Overall' },
+                    { key: 'input', label: 'Input' },
+                    { key: 'actions', label: 'Hành động', className: 'text-right', tdClassName: 'text-right' },
+                ]}
+                rows={results.map((result) => ({
+                    key: result._id,
+                    student: <div className="font-semibold text-slate-900">{result.name}</div>,
+                    className: <span className="font-semibold text-slate-700">{result.className || '-'}</span>,
+                    overall: (
+                        <span className="font-extrabold text-slate-800">
+                            {Number.isFinite(Number(result.overall)) ? Number(result.overall).toFixed(1) : '-'}
+                        </span>
+                    ),
+                    input: <span className="font-semibold text-slate-700">{result.inputScore ?? '-'}</span>,
+                    actions: (
+                        <div className="inline-flex items-center justify-end gap-2">
+                            <button
+                                onClick={() => handleEdit(result)}
+                                className="p-2 rounded-xl text-indigo-700 hover:bg-indigo-50 transition"
+                                title="Sửa"
+                            >
+                                <Edit size={18} />
+                            </button>
+                            <button
+                                onClick={() => handleDelete(result._id)}
+                                className="p-2 rounded-xl text-rose-700 hover:bg-rose-50 transition"
+                                title="Xóa"
+                            >
+                                <Trash2 size={18} />
+                            </button>
+                        </div>
+                    ),
+                }))}
+            />
 
             {showForm && (
                 <StudentResultForm

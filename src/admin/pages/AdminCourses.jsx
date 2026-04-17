@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Edit, Trash2, Plus } from 'lucide-react';
 import client from '../../api/client';
 import CourseForm from '../components/CourseForm';
+import { AdminButton, AdminPageHeader, AdminTable } from '../components/ui/AdminUI';
 
 const AdminCourses = () => {
     const [courses, setCourses] = useState([]);
@@ -50,81 +51,67 @@ const AdminCourses = () => {
         fetchCourses();
     };
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <div className="text-sm font-semibold text-slate-600">Loading...</div>;
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-800">Quản lý Khóa học</h1>
-                <button
-                    onClick={handleAddNew}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-colors"
-                >
-                    <Plus size={20} />
-                    Thêm khóa học
-                </button>
-            </div>
+            <AdminPageHeader
+                title="Khóa học"
+                subtitle="Tạo, chỉnh sửa và quản lý trạng thái hiển thị khóa học."
+                actions={
+                    <AdminButton onClick={handleAddNew}>
+                        <Plus size={18} />
+                        Thêm khóa học
+                    </AdminButton>
+                }
+            />
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <table className="w-full text-left border-collapse">
-                    <thead>
-                        <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500 font-semibold">
-                            <th className="px-6 py-4">Tên khóa học</th>
-                            <th className="px-6 py-4">Giá</th>
-                            <th className="px-6 py-4">Trạng thái</th>
-                            <th className="px-6 py-4 text-right">Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {courses.map((course) => (
-                            <tr key={course._id} className="hover:bg-gray-50 transition-colors">
-                                <td className="px-6 py-4 font-medium text-gray-800">
-                                    {course.name}
-                                </td>
-                                <td className="px-6 py-4 text-gray-600">
-                                    {new Intl.NumberFormat('vi-VN', {
-                                        style: 'currency',
-                                        currency: 'VND',
-                                    }).format(course.price)}
-                                </td>
-                                <td className="px-6 py-4">
-                                    <span
-                                        className={`px-2 py-1 rounded-full text-xs font-bold ${course.is_active
-                                                ? 'bg-green-100 text-green-700'
-                                                : 'bg-red-100 text-red-700'
-                                            }`}
-                                    >
-                                        {course.is_active ? 'Active' : 'Inactive'}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4 text-right">
-                                    <div className="flex items-center justify-end gap-2">
-                                        <button
-                                            onClick={() => handleEdit(course)}
-                                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                        >
-                                            <Edit size={18} />
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(course._id)}
-                                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                        {courses.length === 0 && (
-                            <tr>
-                                <td colSpan="4" className="text-center py-8 text-gray-500">
-                                    No courses found.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
+            <AdminTable
+                emptyText="Chưa có khóa học nào."
+                columns={[
+                    { key: 'name', label: 'Tên khóa học' },
+                    { key: 'price', label: 'Giá' },
+                    { key: 'is_active', label: 'Trạng thái' },
+                    { key: 'actions', label: 'Hành động', className: 'text-right', tdClassName: 'text-right' },
+                ]}
+                rows={courses.map((course) => ({
+                    key: course._id,
+                    name: <div className="font-semibold text-slate-900">{course.name}</div>,
+                    price: (
+                        <div className="font-semibold text-slate-700">
+                            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.price)}
+                        </div>
+                    ),
+                    is_active: (
+                        <span
+                            className={[
+                                'inline-flex items-center rounded-full px-2.5 py-1 text-xs font-extrabold border',
+                                course.is_active ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200',
+                            ].join(' ')}
+                        >
+                            {course.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                    ),
+                    actions: (
+                        <div className="inline-flex items-center justify-end gap-2">
+                            <button
+                                onClick={() => handleEdit(course)}
+                                className="p-2 rounded-xl text-indigo-700 hover:bg-indigo-50 transition"
+                                title="Sửa"
+                            >
+                                <Edit size={18} />
+                            </button>
+                            <button
+                                onClick={() => handleDelete(course._id)}
+                                className="p-2 rounded-xl text-rose-700 hover:bg-rose-50 transition"
+                                title="Xóa"
+                            >
+                                <Trash2 size={18} />
+                            </button>
+                        </div>
+                    ),
+                }))}
+            />
 
             {showForm && (
                 <CourseForm

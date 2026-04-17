@@ -1,5 +1,6 @@
 import React from 'react';
 import { Upload, Trash2, Image as ImageIcon } from 'lucide-react';
+import { AdminButton, AdminCard, AdminCardBody, AdminPageHeader } from '../components/ui/AdminUI';
 
 const AdminMedia = () => {
     const images = [
@@ -13,15 +14,19 @@ const AdminMedia = () => {
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-800">Thư viện ảnh</h1>
-                <button className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-colors">
-                    <Upload size={20} />
-                    Tải ảnh lên
-                </button>
-            </div>
+            <AdminPageHeader
+                title="Media"
+                subtitle="Thư viện ảnh (placeholder). Hiện tại hệ thống dùng upload Cloudinary trong các form."
+                actions={
+                    <AdminButton disabled>
+                        <Upload size={18} />
+                        Tải ảnh lên
+                    </AdminButton>
+                }
+            />
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <AdminCard>
+                <AdminCardBody>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {images.map((image) => (
                         <div key={image.id} className="group relative rounded-lg overflow-hidden border border-gray-200 aspect-square">
@@ -46,7 +51,8 @@ const AdminMedia = () => {
                         <span className="font-medium">Tải ảnh mới</span>
                     </div>
                 </div>
-            </div>
+                </AdminCardBody>
+            </AdminCard>
         </div>
     );
 };

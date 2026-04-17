@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import client from '../../api/client';
 import RichTextEditor from './RichTextEditor';
+import { AdminButton, AdminField, AdminInput, AdminModal } from './ui/AdminUI';
 
 const StudentResultForm = ({ result, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -132,224 +133,110 @@ const StudentResultForm = ({ result, onClose, onSuccess }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                <div className="flex justify-between items-center p-6 border-b">
-                    <h2 className="text-xl font-bold text-gray-800">
-                        {result ? 'Edit Student Result' : 'Add Student Result'}
-                    </h2>
-                    <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-                        <X size={24} />
-                    </button>
+        <AdminModal
+            title={result ? 'Sửa Student Result' : 'Thêm Student Result'}
+            description="Kết quả học viên hiển thị ở trang Results."
+            onClose={onClose}
+            footer={
+                <>
+                    <AdminButton variant="secondary" type="button" onClick={onClose}>
+                        Hủy
+                    </AdminButton>
+                    <AdminButton type="submit" form="student-result-form" disabled={uploading}>
+                        {uploading ? 'Đang lưu...' : result ? 'Cập nhật' : 'Tạo mới'}
+                    </AdminButton>
+                </>
+            }
+        >
+            <form id="student-result-form" onSubmit={handleSubmit} className="space-y-6">
+                {error ? (
+                    <div className="bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-2xl text-sm font-semibold">
+                        {error}
+                    </div>
+                ) : null}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <AdminField label="Student Name">
+                        <AdminInput name="name" value={formData.name} onChange={handleChange} required />
+                    </AdminField>
+
+                    <AdminField label="Class Name (Track)">
+                        <select
+                            name="className"
+                            value={formData.className}
+                            onChange={handleChange}
+                            className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold"
+                        >
+                            <option value="">Select a Track</option>
+                            {tracks.map((track) => (
+                                <option key={track._id} value={track.name}>
+                                    {track.name}
+                                </option>
+                            ))}
+                        </select>
+                    </AdminField>
+
+                    <AdminField label="Input Score">
+                        <AdminInput type="number" step="0.5" name="inputScore" value={formData.inputScore} onChange={handleChange} />
+                    </AdminField>
+
+                    <AdminField label="Overall Score">
+                        <AdminInput type="number" step="0.5" name="overall" value={formData.overall} onChange={handleChange} />
+                    </AdminField>
+
+                    <AdminField label="Listening">
+                        <AdminInput type="number" step="0.5" name="listening" value={formData.listening} onChange={handleChange} />
+                    </AdminField>
+
+                    <AdminField label="Reading">
+                        <AdminInput type="number" step="0.5" name="reading" value={formData.reading} onChange={handleChange} />
+                    </AdminField>
+
+                    <AdminField label="Writing">
+                        <AdminInput type="number" step="0.5" name="writing" value={formData.writing} onChange={handleChange} />
+                    </AdminField>
+
+                    <AdminField label="Speaking">
+                        <AdminInput type="number" step="0.5" name="speaking" value={formData.speaking} onChange={handleChange} />
+                    </AdminField>
+
+                    <div className="md:col-span-2">
+                        <AdminField label="Study Time">
+                            <AdminInput name="studyTime" value={formData.studyTime} onChange={handleChange} />
+                        </AdminField>
+                    </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6">
-                    {error && (
-                        <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>
-                    )}
+                <div>
+                    <div className="text-sm font-extrabold text-slate-700 mb-2">Testimonial</div>
+                    <RichTextEditor
+                        value={formData.testimonial}
+                        onChange={(data) => setFormData((prev) => ({ ...prev, testimonial: data }))}
+                        placeholder="Enter testimonial..."
+                    />
+                </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Student Name
-                            </label>
-                            <input
-                                type="text"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Class Name (Track)
-                            </label>
-                            <select
-                                name="className"
-                                value={formData.className}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            >
-                                <option value="">Select a Track</option>
-                                {tracks.map((track) => (
-                                    <option key={track._id} value={track.name}>
-                                        {track.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Input Score
-                            </label>
-                            <input
-                                type="number"
-                                step="0.5"
-                                name="inputScore"
-                                value={formData.inputScore}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Overall Score
-                            </label>
-                            <input
-                                type="number"
-                                step="0.5"
-                                name="overall"
-                                value={formData.overall}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Listening
-                            </label>
-                            <input
-                                type="number"
-                                step="0.5"
-                                name="listening"
-                                value={formData.listening}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Reading
-                            </label>
-                            <input
-                                type="number"
-                                step="0.5"
-                                name="reading"
-                                value={formData.reading}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Writing
-                            </label>
-                            <input
-                                type="number"
-                                step="0.5"
-                                name="writing"
-                                value={formData.writing}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Speaking
-                            </label>
-                            <input
-                                type="number"
-                                step="0.5"
-                                name="speaking"
-                                value={formData.speaking}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Study Time
-                            </label>
-                            <input
-                                type="text"
-                                name="studyTime"
-                                value={formData.studyTime}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Testimonial
-                            </label>
-                            <RichTextEditor
-                                value={formData.testimonial}
-                                onChange={(data) =>
-                                    setFormData((prev) => ({ ...prev, testimonial: data }))
-                                }
-                                placeholder="Enter testimonial..."
-                            />
-                        </div>
-                    </div>
-
-                    <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Certificate Image
-                        </label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="w-full"
-                        />
-                        {formData.certificateImageUrl && !imageFile && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <AdminField label="Certificate Image">
+                        <input type="file" accept="image/*" onChange={handleImageChange} className="w-full text-sm font-semibold text-slate-600" />
+                        {formData.certificateImageUrl && !imageFile ? (
                             <img
                                 src={formData.certificateImageUrl}
                                 alt="Preview"
-                                className="mt-2 h-32 object-cover rounded"
+                                className="mt-3 h-40 w-auto object-cover rounded-2xl border border-slate-200"
                             />
-                        )}
-                    </div>
+                        ) : null}
+                    </AdminField>
 
-                    <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Profile Image
-                        </label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleProfileImageChange}
-                            className="w-full"
-                        />
-                        {formData.profileImgURL && !profileImageFile && (
-                            <img
-                                src={formData.profileImgURL}
-                                alt="Preview"
-                                className="mt-2 h-32 object-cover rounded"
-                            />
-                        )}
-                    </div>
-
-                    <div className="flex justify-end gap-4">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={uploading}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-                        >
-                            {uploading ? 'Uploading...' : result ? 'Update Result' : 'Create Result'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                    <AdminField label="Profile Image">
+                        <input type="file" accept="image/*" onChange={handleProfileImageChange} className="w-full text-sm font-semibold text-slate-600" />
+                        {formData.profileImgURL && !profileImageFile ? (
+                            <img src={formData.profileImgURL} alt="Preview" className="mt-3 h-40 w-auto object-cover rounded-2xl border border-slate-200" />
+                        ) : null}
+                    </AdminField>
+                </div>
+            </form>
+        </AdminModal>
     );
 };
 

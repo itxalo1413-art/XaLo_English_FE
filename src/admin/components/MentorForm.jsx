@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
 import client from '../../api/client';
 import RichTextEditor from './RichTextEditor';
+import { AdminButton, AdminField, AdminInput, AdminModal } from './ui/AdminUI';
 
 const MentorForm = ({ mentor, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -107,135 +107,64 @@ const MentorForm = ({ mentor, onClose, onSuccess }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-                <div className="flex justify-between items-center p-6 border-b">
-                    <h2 className="text-xl font-bold text-gray-800">
-                        {mentor ? 'Edit Mentor' : 'Add New Mentor'}
-                    </h2>
-                    <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-                        <X size={24} />
-                    </button>
+        <AdminModal
+            title={mentor ? 'Sửa Mentor' : 'Thêm Mentor'}
+            description="Thông tin mentor hiển thị ở trang Teachers."
+            onClose={onClose}
+            footer={
+                <>
+                    <AdminButton variant="secondary" type="button" onClick={onClose}>
+                        Hủy
+                    </AdminButton>
+                    <AdminButton type="submit" form="mentor-form" disabled={uploading}>
+                        {uploading ? 'Đang lưu...' : mentor ? 'Cập nhật' : 'Tạo mới'}
+                    </AdminButton>
+                </>
+            }
+        >
+            <form id="mentor-form" onSubmit={handleSubmit} className="space-y-5">
+                {error ? (
+                    <div className="bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-2xl text-sm font-semibold">
+                        {error}
+                    </div>
+                ) : null}
+
+                <AdminField label="Name">
+                    <AdminInput name="name" value={formData.name} onChange={handleChange} required />
+                </AdminField>
+
+                <AdminField label="Overall Score (IELTS)">
+                    <AdminInput type="number" step="0.5" name="overall" value={formData.overall} onChange={handleChange} required />
+                </AdminField>
+
+                <AdminField label="Slogan Title">
+                    <AdminInput name="slogan_Title" value={formData.slogan_Title} onChange={handleChange} required />
+                </AdminField>
+
+                <div>
+                    <div className="text-sm font-extrabold text-slate-700 mb-2">Slogan Content</div>
+                    <RichTextEditor
+                        value={formData.slogan_Content}
+                        onChange={(data) => setFormData((prev) => ({ ...prev, slogan_Content: data }))}
+                        placeholder="Enter slogan content..."
+                    />
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6">
-                    {error && (
-                        <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>
-                    )}
+                <AdminField label="Profile Image">
+                    <input type="file" accept="image/*" onChange={handleImageChange} className="w-full text-sm font-semibold text-slate-600" />
+                    {formData.imageUrl && !imageFile ? (
+                        <img src={formData.imageUrl} alt="Preview" className="mt-3 h-40 w-auto object-cover rounded-2xl border border-slate-200" />
+                    ) : null}
+                </AdminField>
 
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Name
-                        </label>
-                        <input
-                            type="text"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            required
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Overall Score (IELTS)
-                        </label>
-                        <input
-                            type="number"
-                            step="0.5"
-                            name="overall"
-                            value={formData.overall}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            required
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Slogan Title
-                        </label>
-                        <input
-                            type="text"
-                            name="slogan_Title"
-                            value={formData.slogan_Title}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                            required
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Slogan Content
-                        </label>
-                        <RichTextEditor
-                            value={formData.slogan_Content}
-                            onChange={(data) =>
-                                setFormData((prev) => ({ ...prev, slogan_Content: data }))
-                            }
-                            placeholder="Enter slogan content..."
-                        />
-                    </div>
-
-                    <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Profile Image
-                        </label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="w-full"
-                        />
-                        {formData.imageUrl && !imageFile && (
-                            <img
-                                src={formData.imageUrl}
-                                alt="Preview"
-                                className="mt-2 h-32 object-cover rounded"
-                            />
-                        )}
-                    </div>
-
-                    <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            IELTS Certificate/Score Image
-                        </label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleIeltsImageChange}
-                            className="w-full"
-                        />
-                        {formData.ieltsImage && !ieltsImageFile && (
-                            <img
-                                src={formData.ieltsImage}
-                                alt="IELTS Preview"
-                                className="mt-2 h-32 object-cover rounded"
-                            />
-                        )}
-                    </div>
-
-                    <div className="flex justify-end gap-4">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={uploading}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-                        >
-                            {uploading ? 'Uploading...' : mentor ? 'Update Mentor' : 'Create Mentor'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                <AdminField label="IELTS Certificate/Score Image">
+                    <input type="file" accept="image/*" onChange={handleIeltsImageChange} className="w-full text-sm font-semibold text-slate-600" />
+                    {formData.ieltsImage && !ieltsImageFile ? (
+                        <img src={formData.ieltsImage} alt="IELTS Preview" className="mt-3 h-40 w-auto object-cover rounded-2xl border border-slate-200" />
+                    ) : null}
+                </AdminField>
+            </form>
+        </AdminModal>
     );
 };
 
