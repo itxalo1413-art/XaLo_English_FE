@@ -16,7 +16,7 @@ const ApplicationForm = ({ jobPosition, isOpen, onClose }) => {
         coverLetter: '',
     });
     const [pdfFile, setPdfFile] = useState(null);
-    const [certificatesPdfFile, setCertificatesPdfFile] = useState(null);
+    const [certificatesPdfFiles, setCertificatesPdfFiles] = useState([]);
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
@@ -47,20 +47,42 @@ const ApplicationForm = ({ jobPosition, isOpen, onClose }) => {
         }
     };
 
-    const handleCertificatesPdfChange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+    const MAX_CERT_FILES = 10;
 
-        if (file.type !== 'application/pdf') {
-            setError('Vui lòng chọn tệp PDF');
+    const handleCertificatesPdfChange = (e) => {
+        const picked = Array.from(e.target.files || []);
+        e.target.value = '';
+        if (!picked.length) return;
+
+        const invalidType = picked.find((f) => f.type !== 'application/pdf');
+        if (invalidType) {
+            setError('Chỉ chấp nhận tệp PDF');
             return;
         }
-        if (file.size > 5 * 1024 * 1024) {
-            setError('Kích thước tệp không được vượt quá 5MB');
+        const tooLarge = picked.find((f) => f.size > 5 * 1024 * 1024);
+        if (tooLarge) {
+            setError('Mỗi tệp PDF không được vượt quá 5MB');
             return;
         }
-        setCertificatesPdfFile(file);
-        setError('');
+
+        let overLimit = false;
+        setCertificatesPdfFiles((prev) => {
+            const next = [...prev, ...picked];
+            if (next.length > MAX_CERT_FILES) {
+                overLimit = true;
+                return prev;
+            }
+            return next;
+        });
+        if (overLimit) {
+            setError(`Tối đa ${MAX_CERT_FILES} tệp chứng chỉ`);
+        } else {
+            setError('');
+        }
+    };
+
+    const removeCertificateAt = (index) => {
+        setCertificatesPdfFiles((prev) => prev.filter((_, i) => i !== index));
     };
 
 
@@ -101,9 +123,9 @@ const ApplicationForm = ({ jobPosition, isOpen, onClose }) => {
             formDataToSend.append('jobPosition', jobPosition);
             formDataToSend.append('coverLetter', formData.coverLetter);
             formDataToSend.append('resumePdf', pdfFile);
-            if (certificatesPdfFile) {
-                formDataToSend.append('certificatesPdf', certificatesPdfFile);
-            }
+            certificatesPdfFiles.forEach((file) => {
+                formDataToSend.append('certificatesPdf', file);
+            });
 
             // Submit application with file
             const response = await apiClient.post('/job-applications', formDataToSend, {
@@ -119,7 +141,7 @@ const ApplicationForm = ({ jobPosition, isOpen, onClose }) => {
                     coverLetter: '',
                 });
                 setPdfFile(null);
-                setCertificatesPdfFile(null);
+                setCertificatesPdfFiles([]);
 
                 // Close modal after 2 seconds
                 setTimeout(() => {
@@ -241,30 +263,55 @@ const ApplicationForm = ({ jobPosition, isOpen, onClose }) => {
                             </div>
                         </div>
 
-                        {/* Certificates Upload (Optional) */}
+                        {/* Certificates Upload (Optional, multiple) */}
                         <div>
                             <label className="block text-sm font-semibold text-primary-dark mb-2">
-                                IELTS / Chứng chỉ liên quan (PDF) <span className="text-gray-500 font-normal">(không bắt buộc)</span>
+                                IELTS / Chứng chỉ liên quan (PDF) <span className="text-gray-500 font-normal">(không bắt buộc, tối đa {MAX_CERT_FILES} tệp)</span>
                             </label>
                             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary-dark transition">
                                 <input
                                     type="file"
                                     accept=".pdf"
+                                    multiple
                                     onChange={handleCertificatesPdfChange}
                                     className="hidden"
                                     id="certificates-pdf-upload"
-                                    disabled={uploading}
+                                    disabled={uploading || certificatesPdfFiles.length >= MAX_CERT_FILES}
                                 />
                                 <label htmlFor="certificates-pdf-upload" className="cursor-pointer">
                                     <div className="text-4xl text-gray-400 mb-2">📄</div>
                                     <p className="text-primary-dark font-semibold mb-1">
-                                        {certificatesPdfFile ? certificatesPdfFile.name : 'Chọn tệp PDF'}
+                                        {certificatesPdfFiles.length
+                                            ? `Đã chọn ${certificatesPdfFiles.length} tệp — thêm tệp khác`
+                                            : 'Chọn một hoặc nhiều tệp PDF'}
                                     </p>
                                     <p className="text-sm text-gray-500">
-                                        hoặc kéo thả tệp vào đây (Max 5MB)
+                                        Mỗi tệp tối đa 5MB (giữ Ctrl/Cmd để chọn nhiều file trong hộp thoại)
                                     </p>
                                 </label>
                             </div>
+                            {certificatesPdfFiles.length > 0 && (
+                                <ul className="mt-3 space-y-2 text-left text-sm">
+                                    {certificatesPdfFiles.map((file, idx) => (
+                                        <li
+                                            key={`${file.name}-${file.size}-${idx}`}
+                                            className="flex items-center justify-between gap-2 rounded-lg border border-gray-200 px-3 py-2 bg-gray-50"
+                                        >
+                                            <span className="truncate font-medium text-primary-dark" title={file.name}>
+                                                {file.name}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={() => removeCertificateAt(idx)}
+                                                className="shrink-0 text-rose-600 hover:text-rose-800 text-xs font-semibold"
+                                                disabled={uploading}
+                                            >
+                                                Xóa
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
 
                         {/* Cover Letter */}

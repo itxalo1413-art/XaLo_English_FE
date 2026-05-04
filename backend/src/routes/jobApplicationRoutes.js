@@ -52,7 +52,7 @@ router.post(
     '/',
     upload.fields([
         { name: 'resumePdf', maxCount: 1 },
-        { name: 'certificatesPdf', maxCount: 1 },
+        { name: 'certificatesPdf', maxCount: 10 },
     ]),
     createJobApplication
 );
@@ -85,23 +85,37 @@ router.get('/download/:applicationId', protect, admin, asyncHandler(async (req, 
     res.download(filepath, application.resumePdf.originalName);
 }));
 
-// Download certificates endpoint
+function getCertificateFileAtIndex(application, index) {
+    const i = Number.parseInt(String(index), 10);
+    if (Number.isNaN(i) || i < 0) return null;
+    const list = [];
+    if (application.certificatesPdfs?.length) {
+        list.push(...application.certificatesPdfs);
+    } else if (application.certificatesPdf?.filename) {
+        list.push(application.certificatesPdf);
+    }
+    return list[i] || null;
+}
+
+// Download one certificate PDF by index (0-based). Legacy single file uses index 0.
 router.get('/download-certificates/:applicationId', protect, admin, asyncHandler(async (req, res) => {
     const { applicationId } = req.params;
+    const index = req.query.index != null ? req.query.index : 0;
 
     const application = await JobApplication.findById(applicationId);
+    const fileMeta = application ? getCertificateFileAtIndex(application, index) : null;
 
-    if (!application || !application.certificatesPdf) {
+    if (!fileMeta?.filename) {
         return res.status(404).json({ message: 'File not found' });
     }
 
-    const filepath = path.join(__dirname, '../../uploads/applications', application.certificatesPdf.filename);
+    const filepath = path.join(__dirname, '../../uploads/applications', fileMeta.filename);
 
     if (!fs.existsSync(filepath)) {
         return res.status(404).json({ message: 'File not found on server' });
     }
 
-    res.download(filepath, application.certificatesPdf.originalName);
+    res.download(filepath, fileMeta.originalName || 'certificate.pdf');
 }));
 
 export default router;

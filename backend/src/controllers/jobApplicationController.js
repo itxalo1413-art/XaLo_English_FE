@@ -15,7 +15,7 @@ const createJobApplication = asyncHandler(async (req, res) => {
     }
 
     const resumeFile = req.files?.resumePdf?.[0];
-    const certificatesFile = req.files?.certificatesPdf?.[0];
+    const certificateFiles = req.files?.certificatesPdf || [];
 
     const resumePdf = resumeFile
         ? {
@@ -25,13 +25,11 @@ const createJobApplication = asyncHandler(async (req, res) => {
           }
         : null;
 
-    const certificatesPdf = certificatesFile
-        ? {
-              filename: certificatesFile.filename,
-              path: `/uploads/applications/${certificatesFile.filename}`,
-              originalName: certificatesFile.originalname,
-          }
-        : null;
+    const certificatesPdfs = certificateFiles.map((f) => ({
+        filename: f.filename,
+        path: `/uploads/applications/${f.filename}`,
+        originalName: f.originalname,
+    }));
 
     const jobApplication = new JobApplication({
         fullName,
@@ -40,7 +38,7 @@ const createJobApplication = asyncHandler(async (req, res) => {
         jobPosition,
         coverLetter,
         resumePdf,
-        certificatesPdf,
+        certificatesPdfs,
     });
 
     const createdApplication = await jobApplication.save();

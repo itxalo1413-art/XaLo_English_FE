@@ -4,6 +4,12 @@ import Button from '../../components/common/Button';
 import { Trash2, Eye, Download, MessageSquare } from 'lucide-react';
 import { AdminCard, AdminCardBody, AdminPageHeader, AdminTable } from '../components/ui/AdminUI';
 
+function getApplicationCertificatesList(application) {
+    if (application?.certificatesPdfs?.length) return application.certificatesPdfs;
+    if (application?.certificatesPdf?.filename) return [application.certificatesPdf];
+    return [];
+}
+
 const AdminApplications = () => {
     const [applications, setApplications] = useState([]);
     const [filteredApplications, setFilteredApplications] = useState([]);
@@ -103,10 +109,11 @@ const AdminApplications = () => {
         }
     };
 
-    const handleDownloadCertificates = async (applicationId, filename) => {
+    const handleDownloadCertificates = async (applicationId, filename, index = 0) => {
         try {
             const response = await client.get(`/job-applications/download-certificates/${applicationId}`, {
                 responseType: 'blob',
+                params: { index },
             });
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
@@ -273,57 +280,76 @@ const AdminApplications = () => {
                         { key: 'createdAt', label: 'Ngày gửi' },
                         { key: 'actions', label: 'Hành động', className: 'text-right', tdClassName: 'text-right' },
                     ]}
-                    rows={filteredApplications.map((application) => ({
-                        key: application._id,
-                        fullName: <span className="font-semibold text-slate-900">{application.fullName}</span>,
-                        jobPosition: <span className="font-semibold text-slate-700">{application.jobPosition}</span>,
-                        email: <span className="font-semibold text-slate-700">{application.email}</span>,
-                        phone: <span className="font-semibold text-slate-700">{application.phone}</span>,
-                        status: (
-                            <span className={`inline-flex px-3 py-1 rounded-full text-xs font-extrabold ${getStatusBadge(application.status).color}`}>
-                                {getStatusBadge(application.status).label}
-                            </span>
-                        ),
-                        createdAt: (
-                            <span className="text-sm font-semibold text-slate-600 whitespace-nowrap">
-                                {new Date(application.createdAt).toLocaleDateString('vi-VN')}
-                            </span>
-                        ),
-                        actions: (
-                            <div className="inline-flex items-center justify-end gap-2">
-                                <button
-                                    onClick={() => handleShowDetails(application)}
-                                    className="p-2 rounded-xl text-indigo-700 hover:bg-indigo-50 transition"
-                                    title="Xem chi tiết"
-                                >
-                                    <Eye size={18} />
-                                </button>
-                                <button
-                                    onClick={() => handleDownload(application._id, application.resumePdf?.originalName)}
-                                    className="p-2 rounded-xl text-emerald-700 hover:bg-emerald-50 transition"
-                                    title="Tải CV"
-                                >
-                                    <Download size={18} />
-                                </button>
-                                {application.certificatesPdf && (
+                    rows={filteredApplications.map((application) => {
+                        const certList = getApplicationCertificatesList(application);
+                        return {
+                            key: application._id,
+                            fullName: <span className="font-semibold text-slate-900">{application.fullName}</span>,
+                            jobPosition: <span className="font-semibold text-slate-700">{application.jobPosition}</span>,
+                            email: <span className="font-semibold text-slate-700">{application.email}</span>,
+                            phone: <span className="font-semibold text-slate-700">{application.phone}</span>,
+                            status: (
+                                <span className={`inline-flex px-3 py-1 rounded-full text-xs font-extrabold ${getStatusBadge(application.status).color}`}>
+                                    {getStatusBadge(application.status).label}
+                                </span>
+                            ),
+                            createdAt: (
+                                <span className="text-sm font-semibold text-slate-600 whitespace-nowrap">
+                                    {new Date(application.createdAt).toLocaleDateString('vi-VN')}
+                                </span>
+                            ),
+                            actions: (
+                                <div className="inline-flex items-center justify-end gap-2 flex-wrap">
                                     <button
-                                        onClick={() => handleDownloadCertificates(application._id, application.certificatesPdf?.originalName)}
-                                        className="p-2 rounded-xl text-sky-700 hover:bg-sky-50 transition"
-                                        title="Tải IELTS/Chứng chỉ"
+                                        onClick={() => handleShowDetails(application)}
+                                        className="p-2 rounded-xl text-indigo-700 hover:bg-indigo-50 transition"
+                                        title="Xem chi tiết"
+                                    >
+                                        <Eye size={18} />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDownload(application._id, application.resumePdf?.originalName)}
+                                        className="p-2 rounded-xl text-emerald-700 hover:bg-emerald-50 transition"
+                                        title="Tải CV"
                                     >
                                         <Download size={18} />
                                     </button>
-                                )}
-                                <button
-                                    onClick={() => handleDelete(application._id)}
-                                    className="p-2 rounded-xl text-rose-700 hover:bg-rose-50 transition"
-                                    title="Xóa"
-                                >
-                                    <Trash2 size={18} />
-                                </button>
-                            </div>
-                        ),
-                    }))}
+                                    {certList.map((cert, certIdx) => (
+                                        <button
+                                            key={`${application._id}-cert-${certIdx}`}
+                                            onClick={() =>
+                                                handleDownloadCertificates(
+                                                    application._id,
+                                                    cert?.originalName,
+                                                    certIdx
+                                                )
+                                            }
+                                            className="relative p-2 rounded-xl text-sky-700 hover:bg-sky-50 transition inline-flex items-center justify-center"
+                                            title={
+                                                certList.length > 1
+                                                    ? `Tải chứng chỉ ${certIdx + 1}: ${cert?.originalName || 'PDF'}`
+                                                    : 'Tải IELTS/Chứng chỉ'
+                                            }
+                                        >
+                                            <Download size={18} />
+                                            {certList.length > 1 && (
+                                                <span className="absolute -top-0.5 -right-0.5 min-w-[1rem] h-4 px-0.5 rounded-full bg-sky-600 text-white text-[10px] font-extrabold leading-4 text-center">
+                                                    {certIdx + 1}
+                                                </span>
+                                            )}
+                                        </button>
+                                    ))}
+                                    <button
+                                        onClick={() => handleDelete(application._id)}
+                                        className="p-2 rounded-xl text-rose-700 hover:bg-rose-50 transition"
+                                        title="Xóa"
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
+                            ),
+                        };
+                    })}
                 />
 
                 {/* Details Modal */}
@@ -391,14 +417,27 @@ const AdminApplications = () => {
                                 {/* Certificates */}
                                 <div>
                                     <h3 className="text-lg font-semibold text-gray-800 mb-2">IELTS / Chứng Chỉ</h3>
-                                    {selectedApplication.certificatesPdf ? (
-                                        <button
-                                            onClick={() => handleDownloadCertificates(selectedApplication._id, selectedApplication.certificatesPdf.originalName)}
-                                            className="text-blue-600 hover:text-blue-800 underline flex items-center gap-2"
-                                        >
-                                            <Download size={18} />
-                                            Tải {selectedApplication.certificatesPdf.originalName || 'Chứng chỉ'}
-                                        </button>
+                                    {getApplicationCertificatesList(selectedApplication).length > 0 ? (
+                                        <ul className="space-y-2">
+                                            {getApplicationCertificatesList(selectedApplication).map((cert, certIdx) => (
+                                                <li key={`detail-cert-${certIdx}`}>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            handleDownloadCertificates(
+                                                                selectedApplication._id,
+                                                                cert?.originalName,
+                                                                certIdx
+                                                            )
+                                                        }
+                                                        className="text-blue-600 hover:text-blue-800 underline flex items-center gap-2 text-left"
+                                                    >
+                                                        <Download size={18} />
+                                                        Tải {cert?.originalName || `Chứng chỉ ${certIdx + 1}`}
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
                                     ) : (
                                         <p className="text-gray-500">Không có file chứng chỉ</p>
                                     )}
