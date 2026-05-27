@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/sitemap.xml",
-      "destination": "https://api.xalo.edu.vn/sitemap.xml"
+      "destination": "/api/sitemap"
     },
     {
       "source": "/robots.txt",
-      "destination": "https://api.xalo.edu.vn/robots.txt"
+      "destination": "/api/robots"
     },
     {
       "source": "/api/(.*)",
