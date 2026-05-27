@@ -8,42 +8,42 @@ const RelatedCourses = () => {
             title: "Foundation",
             image: "https://xalo.edu.vn/image/cache/catalog/khoa-hoc/web-xa-lo-english-2-352x300.png",
             input: "0 - 4.0",
-            output: "4.0 - 4.5+",
+            output: "4.0 - 4.5",
             link: "/course-details/foundation"
         },
         {
             title: "Momentum",
             image: "https://xalo.edu.vn/image/cache/catalog/khoa-hoc/web-xa-lo-english-3-352x300.png",
             input: "4.5 - 5.5",
-            output: "Tăng 0.5 - 1.0",
+            output: "6",
             link: "/course-details/momentum"
         },
         {
             title: "Advanced",
             image: "https://xalo.edu.vn/image/cache/catalog/khoa-hoc/web-xa-lo-english-4-352x300.png",
-            input: "6.0 - 6.5",
-            output: "6.5 - 7.0+",
+            input: "6.0+",
+            output: "7",
             link: "/course-details/advanced"
         },
         {
             title: "Core",
             image: "https://xalo.edu.vn/image/cache/catalog/khoa-hoc/web-xa-lo-english-6-352x300.png",
-            input: "4.0 trở xuống",
-            output: "Tăng 0.5 - 1.0",
+            input: "3.0 - 4.0",
+            output: "4.0 - 4.5",
             link: "/course-details/core"
         },
         {
             title: "Upstream",
             image: "https://xalo.edu.vn/image/cache/catalog/khoa-hoc/web-xa-lo-english-7-352x300.png",
-            input: "4.5 - 5.0",
-            output: "Tăng 0.5 - 1.0",
+            input: "4.5 - 5.5",
+            output: "6+",
             link: "/course-details/upstream"
         },
         {
             title: "Soar",
             image: "https://xalo.edu.vn/image/cache/catalog/khoa-hoc/web-xa-lo-english-8-352x300.png",
-            input: "5.5 - 6.0",
-            output: "Tăng 0.5 - 1.0",
+            input: "6.0+",
+            output: "7",
             link: "/course-details/soar"
         }
     ];

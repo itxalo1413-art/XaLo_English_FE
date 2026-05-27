@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /admin/
+
+# Production sitemap is served by API at /sitemap.xml (same host when FE+BE unified).
+# For Vite-only dev, proxy /sitemap.xml to backend or set Sitemap in Search Console manually.
+Sitemap: https://www.xalo.edu.vn/sitemap.xml

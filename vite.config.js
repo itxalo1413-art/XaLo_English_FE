@@ -21,10 +21,17 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        // XaloEnglish NestJS backend
-        target: 'http://localhost:5001',
+        target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false,
+      },
+      '/sitemap.xml': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+      '/robots.txt': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
       },
     },
   },

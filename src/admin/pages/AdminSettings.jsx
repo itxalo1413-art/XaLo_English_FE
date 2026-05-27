@@ -9,6 +9,8 @@ const AdminSettings = () => {
         facebook_link: '',
         meta_title_home: '',
         meta_description_home: '',
+        meta_title_news: '',
+        meta_description_news: '',
         header_script: '',
         body_script: '',
     });
@@ -27,6 +29,8 @@ const AdminSettings = () => {
                         facebook_link: data.facebook_link || '',
                         meta_title_home: data.meta_title_home || '',
                         meta_description_home: data.meta_description_home || '',
+                        meta_title_news: data.meta_title_news || '',
+                        meta_description_news: data.meta_description_news || '',
                         header_script: data.header_script || '',
                         body_script: data.body_script || '',
                     });
@@ -131,6 +135,32 @@ const AdminSettings = () => {
                         </div>
 
                         <div className="border-t border-slate-200 pt-8">
+                            <h2 className="text-base font-extrabold text-slate-900 mb-4">SEO trang Tin tức (/news)</h2>
+                            <div className="space-y-4 mb-8">
+                                <div>
+                                    <label className="block text-sm font-extrabold text-slate-700 mb-2">Meta Title</label>
+                                    <input
+                                        type="text"
+                                        name="meta_title_news"
+                                        value={formData.meta_title_news}
+                                        onChange={handleChange}
+                                        placeholder="Tin tức IELTS & tiếng Anh | Xa Lộ English"
+                                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-extrabold text-slate-700 mb-2">Meta Description</label>
+                                    <textarea
+                                        name="meta_description_news"
+                                        value={formData.meta_description_news}
+                                        onChange={handleChange}
+                                        rows="3"
+                                        placeholder="Cập nhật kiến thức, kinh nghiệm học IELTS..."
+                                        className="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold"
+                                    />
+                                </div>
+                            </div>
+
                             <h2 className="text-base font-extrabold text-slate-900 mb-4">SEO Homepage</h2>
                             <div className="space-y-4">
                                 <div>

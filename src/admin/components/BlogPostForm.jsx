@@ -1,14 +1,21 @@
 import { useState, useEffect } from 'react';
+import { Plus, Trash2 } from 'lucide-react';
 import client from '../../api/client';
 import RichTextEditor from './RichTextEditor';
 import { AdminButton, AdminField, AdminInput, AdminModal, AdminTextarea } from './ui/AdminUI';
 
+const emptyFaq = () => ({ question: '', answer: '' });
+
 const BlogPostForm = ({ post, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
         title: '',
+        slug: '',
         coverImageUrl: '',
         excerpt: '',
+        metaTitle: '',
+        metaDescription: '',
         contentHtml: '',
+        faqs: [emptyFaq()],
     });
     const [imageFile, setImageFile] = useState(null);
     const [uploading, setUploading] = useState(false);
@@ -18,9 +25,13 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
         if (post) {
             setFormData({
                 title: post.title,
+                slug: post.slug || '',
                 coverImageUrl: post.coverImageUrl || '',
                 excerpt: post.excerpt || '',
+                metaTitle: post.metaTitle || '',
+                metaDescription: post.metaDescription || '',
                 contentHtml: post.contentHtml,
+                faqs: post.faqs?.length ? post.faqs : [emptyFaq()],
             });
         }
     }, [post]);
@@ -30,6 +41,25 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
         setFormData((prev) => ({
             ...prev,
             [name]: value,
+        }));
+    };
+
+    const handleFaqChange = (index, field, value) => {
+        setFormData((prev) => {
+            const faqs = [...prev.faqs];
+            faqs[index] = { ...faqs[index], [field]: value };
+            return { ...prev, faqs };
+        });
+    };
+
+    const addFaq = () => {
+        setFormData((prev) => ({ ...prev, faqs: [...prev.faqs, emptyFaq()] }));
+    };
+
+    const removeFaq = (index) => {
+        setFormData((prev) => ({
+            ...prev,
+            faqs: prev.faqs.filter((_, i) => i !== index),
         }));
     };
 
@@ -72,7 +102,13 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
             if (!imageUrl) return;
         }
 
-        const dataToSubmit = { ...formData, coverImageUrl: imageUrl };
+        const faqs = formData.faqs.filter((f) => f.question?.trim() && f.answer?.trim());
+
+        const dataToSubmit = {
+            ...formData,
+            coverImageUrl: imageUrl,
+            faqs,
+        };
 
         try {
             if (post) {
@@ -113,12 +149,101 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
                     <AdminInput name="title" value={formData.title} onChange={handleChange} required />
                 </AdminField>
 
+                <AdminField label="Slug (URL)">
+                    <AdminInput
+                        name="slug"
+                        value={formData.slug}
+                        onChange={handleChange}
+                        placeholder="quy-doi-diem-ielts-2026"
+                    />
+                    <p className="text-xs text-slate-500 mt-1 font-semibold">
+                        Để trống khi tạo mới sẽ tự sinh từ tiêu đề. Không đổi slug sau khi đã index Google.
+                    </p>
+                </AdminField>
+
                 <AdminField label="Excerpt">
                     <AdminTextarea name="excerpt" value={formData.excerpt} onChange={handleChange} rows={3} />
                 </AdminField>
 
+                <div className="border-t border-slate-200 pt-5 space-y-4">
+                    <h3 className="text-sm font-extrabold text-slate-900">SEO bài viết</h3>
+                    <p className="text-xs text-slate-500 font-semibold">
+                        Để trống sẽ dùng tiêu đề / mô tả ngắn của bài. Meta title nên khoảng 50–60 ký tự.
+                    </p>
+                    <AdminField label="Meta title">
+                        <AdminInput
+                            name="metaTitle"
+                            value={formData.metaTitle}
+                            onChange={handleChange}
+                            placeholder={formData.title || 'Tiêu đề hiển thị trên Google'}
+                        />
+                    </AdminField>
+                    <AdminField label="Meta description">
+                        <AdminTextarea
+                            name="metaDescription"
+                            value={formData.metaDescription}
+                            onChange={handleChange}
+                            rows={3}
+                            placeholder={formData.excerpt || 'Mô tả hiển thị trên kết quả tìm kiếm (khoảng 150–160 ký tự)'}
+                        />
+                    </AdminField>
+                </div>
+
+                <div className="border-t border-slate-200 pt-5 space-y-4">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h3 className="text-sm font-extrabold text-slate-900">FAQ (Câu hỏi thường gặp)</h3>
+                            <p className="text-xs text-slate-500 font-semibold mt-1">
+                                Hiển thị cuối bài + schema FAQPage cho Google.
+                            </p>
+                        </div>
+                        <AdminButton type="button" variant="secondary" onClick={addFaq}>
+                            <Plus size={16} />
+                            Thêm câu hỏi
+                        </AdminButton>
+                    </div>
+                    {formData.faqs.map((faq, index) => (
+                        <div
+                            key={index}
+                            className="rounded-2xl border border-slate-200 p-4 space-y-3 bg-slate-50/50"
+                        >
+                            <div className="flex justify-between items-center">
+                                <span className="text-xs font-bold text-slate-500">Câu {index + 1}</span>
+                                {formData.faqs.length > 1 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => removeFaq(index)}
+                                        className="text-rose-600 hover:text-rose-700 p-1"
+                                        aria-label="Xóa câu hỏi"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                )}
+                            </div>
+                            <AdminField label="Câu hỏi">
+                                <AdminInput
+                                    value={faq.question}
+                                    onChange={(e) => handleFaqChange(index, 'question', e.target.value)}
+                                    placeholder="IELTS 6.5 có được quy đổi thành 10 điểm không?"
+                                />
+                            </AdminField>
+                            <AdminField label="Trả lời">
+                                <AdminTextarea
+                                    value={faq.answer}
+                                    onChange={(e) => handleFaqChange(index, 'answer', e.target.value)}
+                                    rows={3}
+                                    placeholder="Có trường có, có trường không..."
+                                />
+                            </AdminField>
+                        </div>
+                    ))}
+                </div>
+
                 <div>
                     <div className="text-sm font-extrabold text-slate-700 mb-2">Content</div>
+                    <p className="text-xs text-slate-500 font-semibold mb-2">
+                        Dùng Heading 2 / Heading 3 trong editor để tự sinh mục lục (TOC).
+                    </p>
                     <RichTextEditor
                         value={formData.contentHtml}
                         onChange={(data) => setFormData((prev) => ({ ...prev, contentHtml: data }))}

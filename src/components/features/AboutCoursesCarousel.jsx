@@ -9,8 +9,8 @@ const AboutCoursesCarousel = () => {
             id: 1,
             title: "FOUNDATION",
             image: "https://xalo.edu.vn/image/catalog/services/courses/Ground.svg",
-            input: "Từ 4.0 trở xuống",
-            output: "4.0 - 4.5+",
+            input: "0 - 4.0",
+            output: "4.0 - 4.5",
             format: "Offline",
             duration: "14 tuần",
             durationNote: "(tương đương 3,5 tháng)"
@@ -20,8 +20,8 @@ const AboutCoursesCarousel = () => {
             title: "MOMENTUM",
             image: "https://xalo.edu.vn/image/catalog/services/courses/MOMENTUM.svg",
             input: "4.5-5.5",
-            output: "Tăng 0.5 đến 1 band",
-            format: "Online",
+            output: "6",
+            format: "Offline",
             duration: "12 tuần",
             durationNote: "(tương đương 3 tháng)"
         },
@@ -29,8 +29,8 @@ const AboutCoursesCarousel = () => {
             id: 3,
             title: "ADVANCED",
             image: "https://xalo.edu.vn/image/catalog/services/courses/ADVANCED.svg",
-            input: "6.0 - 6.5",
-            output: "Tăng 0.5 đến 1 band",
+            input: "6.0+",
+            output: "7",
             format: "Offline",
             duration: "12 tuần",
             durationNote: "(tương đương 3 tháng)"
@@ -39,8 +39,8 @@ const AboutCoursesCarousel = () => {
             id: 4,
             title: "CORE",
             image: "https://xalo.edu.vn/image/catalog/services/courses/Core-ONLINE.svg",
-            input: "Từ 4.0 trở xuống",
-            output: "4.0 - 4.5+",
+            input: "3.0 - 4.0",
+            output: "4.0 - 4.5",
             format: "Online",
             duration: "14 tuần",
             durationNote: "(tương đương 3,5 tháng)"
@@ -50,7 +50,7 @@ const AboutCoursesCarousel = () => {
             title: "UPSTREAM",
             image: "https://xalo.edu.vn/image/catalog/services/courses/Upstream-ONLINE.svg",
             input: "4.5 - 5.5",
-            output: "Tăng 0.5 đến 1 band",
+            output: "6+",
             format: "Online",
             duration: "12 tuần",
             durationNote: "(tương đương 3 tháng)"
@@ -59,8 +59,8 @@ const AboutCoursesCarousel = () => {
             id: 6,
             title: "SOAR",
             image: "https://xalo.edu.vn/image/catalog/services/courses/Soar-ONLINE.svg",
-            input: "6.0 - 6.5",
-            output: "Tăng 0.5 đến 1 band",
+            input: "6.0+",
+            output: "7",
             format: "Online",
             duration: "12 tuần",
             durationNote: "(tương đương 3 tháng)"

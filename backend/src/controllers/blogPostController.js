@@ -35,15 +35,21 @@ const getBlogPostBySlug = asyncHandler(async (req, res) => {
 // @route   POST /api/v1/blog-posts
 // @access  Private/Admin
 const createBlogPost = asyncHandler(async (req, res) => {
-    const { title, coverImageUrl, excerpt, contentHtml } = req.body;
+    const { title, slug: slugInput, coverImageUrl, excerpt, contentHtml, metaTitle, metaDescription, faqs } =
+        req.body;
 
-    const slug = slugify(title, { lower: true, strict: true });
+    const slug = slugInput?.trim()
+        ? slugify(slugInput, { lower: true, strict: true })
+        : slugify(title, { lower: true, strict: true });
 
     const post = new BlogPost({
         title,
         slug,
         coverImageUrl,
         excerpt,
+        metaTitle,
+        metaDescription,
+        faqs: Array.isArray(faqs) ? faqs : [],
         contentHtml,
     });
 
@@ -59,11 +65,16 @@ const updateBlogPost = asyncHandler(async (req, res) => {
 
     if (post) {
         post.title = req.body.title || post.title;
-        if (req.body.title) {
-            post.slug = slugify(req.body.title, { lower: true, strict: true });
+        if (req.body.slug?.trim()) {
+            post.slug = slugify(req.body.slug, { lower: true, strict: true });
         }
-        post.coverImageUrl = req.body.coverImageUrl || post.coverImageUrl;
-        post.excerpt = req.body.excerpt || post.excerpt;
+        post.coverImageUrl = req.body.coverImageUrl ?? post.coverImageUrl;
+        post.excerpt = req.body.excerpt ?? post.excerpt;
+        post.metaTitle = req.body.metaTitle ?? post.metaTitle;
+        post.metaDescription = req.body.metaDescription ?? post.metaDescription;
+        if (req.body.faqs !== undefined) {
+            post.faqs = Array.isArray(req.body.faqs) ? req.body.faqs : [];
+        }
         post.contentHtml = req.body.contentHtml || post.contentHtml;
 
         const updatedPost = await post.save();

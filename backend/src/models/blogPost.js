@@ -7,6 +7,15 @@ const blogPostSchema = new mongoose.Schema(
 
     coverImageUrl: String,
     excerpt: String,
+    metaTitle: String,
+    metaDescription: String,
+
+    faqs: [
+      {
+        question: { type: String, required: true },
+        answer: { type: String, required: true },
+      },
+    ],
 
     contentHtml: { type: String, required: true },
   },

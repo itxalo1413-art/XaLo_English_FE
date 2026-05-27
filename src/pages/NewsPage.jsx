@@ -1,12 +1,24 @@
 import React from 'react';
 import Section from '../components/common/Section';
 import NewsCard from '../components/features/NewsCard';
+import PageSEO from '../components/common/PageSEO';
+import { useSettings } from '../context/SettingsContext';
+import { getSiteUrl } from '../utils/siteUrl';
 import slider_khac from '../assets/slider/sliderKhac.png'
 import client from '../api/client';
 
+const DEFAULT_NEWS_TITLE = 'Tin tức IELTS & tiếng Anh';
+const DEFAULT_NEWS_DESCRIPTION =
+    'Cập nhật kiến thức, kinh nghiệm và tài liệu học tiếng Anh mới nhất từ đội ngũ Xa Lộ English.';
+
 
 const NewsPage = () => {
+    const { settings } = useSettings();
     const [newsItems, setNewsItems] = React.useState([]);
+
+    const seoTitle = settings?.meta_title_news || DEFAULT_NEWS_TITLE;
+    const seoDescription = settings?.meta_description_news || DEFAULT_NEWS_DESCRIPTION;
+    const siteUrl = getSiteUrl();
 
     React.useEffect(() => {
         const fetchNews = async () => {
@@ -28,6 +40,23 @@ const NewsPage = () => {
 
     return (
         <div className="pt-20 bg-white">
+            <PageSEO
+                title={seoTitle}
+                description={seoDescription}
+                path="/news"
+                jsonLd={{
+                    '@context': 'https://schema.org',
+                    '@type': 'CollectionPage',
+                    name: seoTitle,
+                    description: seoDescription,
+                    url: `${siteUrl}/news`,
+                    isPartOf: {
+                        '@type': 'WebSite',
+                        name: 'Xa Lộ English',
+                        url: siteUrl,
+                    },
+                }}
+            />
             {/* Hero Section */}
             <section className="relative pt-32 pb-24 overflow-hidden min-h-[60vh]"
                 style={{

@@ -21,6 +21,9 @@ import programRoutes from './src/routes/programRoutes.js';
 import dashboardRoutes from './src/routes/dashboardRoutes.js';
 import jobApplicationRoutes from './src/routes/jobApplicationRoutes.js';
 import jobPositionRoutes from './src/routes/jobPositionRoutes.js';
+import seoRoutes from './src/routes/seoRoutes.js';
+import { getSitemap, getRobots } from './src/controllers/seoController.js';
+import { createPrerenderMiddleware } from './src/middleware/prerenderMiddleware.js';
 
 connectDB();
 
@@ -82,22 +85,37 @@ app.use('/api/v1/programs', programRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/job-applications', jobApplicationRoutes);
 app.use('/api/v1/job-positions', jobPositionRoutes);
+app.use('/api/v1/seo', seoRoutes);
 
-// --- Xử lý Production (Phục vụ FE từ BE nếu cần) ---
+// SEO: sitemap & robots (same origin as site in production)
+app.get('/sitemap.xml', getSitemap);
+app.get('/robots.txt', getRobots);
+
+// --- Production: SPA + prerender only when dist/ exists (API-only host skips this) ---
 const NODE_ENV = process.env.NODE_ENV || 'development';
-if (NODE_ENV === 'production') {
-    let distPath = path.resolve(__dirname, '../dist');
-    if (!fs.existsSync(path.join(distPath, 'index.html'))) {
-        distPath = path.resolve(__dirname, 'dist');
+let distPath = null;
+const candidateDistPaths = [
+    path.resolve(__dirname, '../dist'),
+    path.resolve(__dirname, 'dist'),
+];
+for (const candidate of candidateDistPaths) {
+    if (fs.existsSync(path.join(candidate, 'index.html'))) {
+        distPath = candidate;
+        break;
     }
-    
+}
+
+if (distPath) {
+    app.use(createPrerenderMiddleware(distPath));
     app.use(express.static(distPath));
-    // Catch-all route to serve index.html for SPA
-    app.get('/*index', (req, res) => {
+    app.get('/{*splat}', (req, res) => {
         res.sendFile(path.join(distPath, 'index.html'));
     });
 } else {
-    app.get('/', (req, res) => { res.send('Xalo English API is running...'); });
+    app.use(createPrerenderMiddleware(null));
+    app.get('/', (req, res) => {
+        res.send('Xalo English API is running...');
+    });
 }
 
 const PORT = process.env.PORT || 5000;

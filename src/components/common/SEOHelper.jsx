@@ -1,9 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useLocation } from 'react-router-dom';
 import { useSettings } from '../../context/SettingsContext';
 
 const SEOHelper = () => {
+    const { pathname } = useLocation();
     const { settings } = useSettings();
+    const isHomePage = pathname === '/';
     const headersInjected = useRef(false);
     const bodyInjected = useRef(false);
 
@@ -60,7 +63,7 @@ const SEOHelper = () => {
         }
     }, [settings]);
 
-    if (!settings) return null;
+    if (!settings || !isHomePage) return null;
 
     return (
         <Helmet>

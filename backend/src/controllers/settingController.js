@@ -24,6 +24,8 @@ const updateSettings = asyncHandler(async (req, res) => {
         facebook_link,
         meta_title_home,
         meta_description_home,
+        meta_title_news,
+        meta_description_news,
         header_script,
         body_script,
     } = req.body;
@@ -37,6 +39,9 @@ const updateSettings = asyncHandler(async (req, res) => {
         settings.meta_title_home = meta_title_home || settings.meta_title_home;
         settings.meta_description_home =
             meta_description_home || settings.meta_description_home;
+        settings.meta_title_news = meta_title_news ?? settings.meta_title_news;
+        settings.meta_description_news =
+            meta_description_news ?? settings.meta_description_news;
         settings.header_script = header_script || settings.header_script;
         settings.body_script = body_script || settings.body_script;
 
@@ -49,6 +54,8 @@ const updateSettings = asyncHandler(async (req, res) => {
             facebook_link,
             meta_title_home,
             meta_description_home,
+            meta_title_news,
+            meta_description_news,
             header_script,
             body_script,
         });
