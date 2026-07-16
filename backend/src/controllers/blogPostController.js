@@ -35,7 +35,19 @@ const getBlogPostBySlug = asyncHandler(async (req, res) => {
 // @route   POST /api/v1/blog-posts
 // @access  Private/Admin
 const createBlogPost = asyncHandler(async (req, res) => {
-    const { title, slug: slugInput, coverImageUrl, excerpt, contentHtml, metaTitle, metaDescription, faqs } =
+    const {
+        title,
+        slug: slugInput,
+        coverImageUrl,
+        excerpt,
+        contentHtml,
+        metaTitle,
+        metaDescription,
+        faqs,
+        showTopLeadForm,
+        topLeadFormTitle,
+        topLeadFormSubtitle,
+    } =
         req.body;
 
     const slug = slugInput?.trim()
@@ -50,6 +62,9 @@ const createBlogPost = asyncHandler(async (req, res) => {
         metaTitle,
         metaDescription,
         faqs: Array.isArray(faqs) ? faqs : [],
+        showTopLeadForm: showTopLeadForm ?? false,
+        topLeadFormTitle: topLeadFormTitle ?? '',
+        topLeadFormSubtitle: topLeadFormSubtitle ?? '',
         contentHtml,
     });
 
@@ -75,6 +90,9 @@ const updateBlogPost = asyncHandler(async (req, res) => {
         if (req.body.faqs !== undefined) {
             post.faqs = Array.isArray(req.body.faqs) ? req.body.faqs : [];
         }
+        post.showTopLeadForm = req.body.showTopLeadForm ?? post.showTopLeadForm;
+        post.topLeadFormTitle = req.body.topLeadFormTitle ?? post.topLeadFormTitle;
+        post.topLeadFormSubtitle = req.body.topLeadFormSubtitle ?? post.topLeadFormSubtitle;
         post.contentHtml = req.body.contentHtml || post.contentHtml;
 
         const updatedPost = await post.save();

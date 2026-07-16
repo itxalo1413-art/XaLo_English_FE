@@ -61,6 +61,31 @@ const seedJobPositions = async () => {
                 location: 'Hồ Chí Minh',
                 type: 'Full-time',
                 isActive: true,
+            },
+            {
+                title: 'Giáo viên IELTS',
+                description: 'Trực tiếp giảng dạy các lớp IELTS theo giáo trình của trung tâm theo hình thức Online và Offline. Theo dõi, đánh giá kết quả học tập; nhận xét, hỗ trợ học viên trong suốt quá trình học.\n\nTham gia xây dựng, cập nhật tài liệu, chương trình học và đề xuất cải tiến tài liệu & phương pháp giảng dạy.\n\nSoạn bài giảng, bài tập, chấm bài và thực hiện các công tác học vụ theo quy định.\n\nPhối hợp với các bộ phận liên quan khác nhằm đảm bảo chất lượng đào tạo và trải nghiệm học tập của học viên.\n\nĐịa điểm làm việc: 250 Nguyễn Đình Chính, phường Phú Nhuận, Tp. HCM\n\nThời gian làm việc không quá 48h/tuần. Trong đó, thời gian cho công việc giảng dạy các lớp tại trung tâm cụ thể như sau:\n- Lớp nhóm: 2-4-6 hoặc 3-5-7 với hai khung giờ sau: 18h-19h45 và 19h45-21h30;\n- Lớp 1-1: được sắp xếp dựa trên thời gian rảnh của giáo viên và học viên.',
+                requirements: [
+                    'Tốt nghiệp cao đẳng trở lên ngành Sư phạm Tiếng Anh. Hoặc tốt nghiệp cao đẳng trở lên ngành ngôn ngữ Anh và có chứng chỉ nghiệp vụ sư phạm.',
+                    'Có chứng chỉ IELTS từ 8.0 trở lên, không có kỹ năng nào dưới 7.0',
+                    'Độ tuổi: ưu tiên các ứng viên có độ tuổi từ 21-28 tuổi.',
+                    'Có đam mê giảng dạy, nguồn năng lượng vui vẻ, dễ chia sẻ và quản lý lớp tốt là lợi thế lớn.',
+                    'Tác phong chuyên nghiệp, đúng giờ, tuân thủ quy trình và cam kết với chất lượng dạy học.',
+                    'Có tinh thần học hỏi, cầu tiến và hợp tác với các bộ phận liên quan.'
+                ],
+                benefits: [
+                    'Thu nhập: Thỏa thuận, cạnh tranh theo năng lực (15.000.000 - 25.000.000 trở lên)',
+                    'Thưởng theo thành tích.',
+                    'Được tài trợ các buổi đào tạo để nâng cao kỹ năng mềm và kỹ năng giảng dạy.',
+                    'Môi trường làm việc trẻ, chuyên nghiệp, cởi mở, năng động, tôn trọng và tạo điều kiện phát huy giá trị bản thân.',
+                    'Được hưởng đầy đủ các quyền lợi theo chính sách của công ty.',
+                    'Địa điểm, thời gian làm việc: 250 Nguyễn Đình Chính, phường Phú Nhuận, Tp.HCM. Thời gian làm việc linh hoạt'
+                ],
+                salary: 'Thỏa thuận (15.000.000 - 25.000.000 trở lên)',
+                location: 'Hồ Chí Minh',
+                type: 'Full-time',
+                isActive: true,
+                displayOrder: 1
             }
         ];
 

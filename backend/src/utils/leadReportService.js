@@ -74,6 +74,8 @@ export const sendLeadSummaryReport = async (reportLabel, hoursBack) => {
             </div>
         `;
 
+        console.log(`[${reportLabel}] Gửi báo cáo tới: ${process.env.ADMIN_EMAIL}`);
+
         await sendEmail({
             email: process.env.ADMIN_EMAIL,
             subject: `[BÁO CÁO] ${leadCount} Lead mới lúc ${reportLabel}`,

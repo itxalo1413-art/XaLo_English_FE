@@ -21,16 +21,17 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        // backend/.env uses PORT=5001 (5000 is often taken by macOS AirPlay)
+        target: 'http://localhost:5001',
         changeOrigin: true,
         secure: false,
       },
       '/sitemap.xml': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:5001',
         changeOrigin: true,
       },
       '/robots.txt': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:5001',
         changeOrigin: true,
       },
     },

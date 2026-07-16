@@ -16,6 +16,9 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
         metaDescription: '',
         contentHtml: '',
         faqs: [emptyFaq()],
+        showTopLeadForm: false,
+        topLeadFormTitle: '',
+        topLeadFormSubtitle: '',
     });
     const [imageFile, setImageFile] = useState(null);
     const [uploading, setUploading] = useState(false);
@@ -32,6 +35,9 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
                 metaDescription: post.metaDescription || '',
                 contentHtml: post.contentHtml,
                 faqs: post.faqs?.length ? post.faqs : [emptyFaq()],
+                showTopLeadForm: post.showTopLeadForm ?? false,
+                topLeadFormTitle: post.topLeadFormTitle ?? '',
+                topLeadFormSubtitle: post.topLeadFormSubtitle ?? '',
             });
         }
     }, [post]);
@@ -187,6 +193,42 @@ const BlogPostForm = ({ post, onClose, onSuccess }) => {
                             placeholder={formData.excerpt || 'Mô tả hiển thị trên kết quả tìm kiếm (khoảng 150–160 ký tự)'}
                         />
                     </AdminField>
+                </div>
+
+                <div className="border-t border-slate-200 pt-5 space-y-4">
+                    <h3 className="text-sm font-extrabold text-slate-900">Form đăng ký ở đầu bài</h3>
+                    <label className="flex items-center gap-3 text-sm font-semibold text-slate-700">
+                        <input
+                            type="checkbox"
+                            checked={!!formData.showTopLeadForm}
+                            onChange={(e) =>
+                                setFormData((prev) => ({ ...prev, showTopLeadForm: e.target.checked }))
+                            }
+                            className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary"
+                        />
+                        Hiển thị form trên trang chi tiết bài viết
+                    </label>
+
+                    <div className="space-y-2">
+                        <AdminField label="Tiêu đề form">
+                            <AdminInput
+                                name="topLeadFormTitle"
+                                value={formData.topLeadFormTitle}
+                                onChange={handleChange}
+                                placeholder="Đăng ký tư vấn nhận học bổng"
+                            />
+                        </AdminField>
+
+                        <AdminField label="Subtitle form">
+                            <AdminTextarea
+                                name="topLeadFormSubtitle"
+                                value={formData.topLeadFormSubtitle}
+                                onChange={handleChange}
+                                rows={2}
+                                placeholder="Nhận tư vấn lộ trình & cơ hội học bổng phù hợp..."
+                            />
+                        </AdminField>
+                    </div>
                 </div>
 
                 <div className="border-t border-slate-200 pt-5 space-y-4">

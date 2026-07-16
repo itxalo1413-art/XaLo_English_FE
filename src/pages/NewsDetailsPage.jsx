@@ -10,6 +10,7 @@ import RelatedPosts from '../components/blog/RelatedPosts';
 import { getSiteUrl } from '../utils/siteUrl';
 import { prepareArticleContent, buildArticleJsonLd } from '../utils/articleContent';
 import { Calendar, User } from 'lucide-react';
+import CTASection from '../components/features/CTASection';
 
 const NewsDetailsPage = () => {
     const { slug } = useParams();
@@ -120,6 +121,16 @@ const NewsDetailsPage = () => {
                 <div className="container mx-auto px-4 -mt-20 relative z-10">
                     <div className="bg-white rounded-xl shadow-xl p-8 md:p-12 max-w-4xl mx-auto">
                         <ArticleBreadcrumb title={post.title} />
+
+                        {post.showTopLeadForm && (
+                            <div className="mb-10">
+                                <CTASection
+                                    title={post.topLeadFormTitle || undefined}
+                                    subtitle={post.topLeadFormSubtitle || undefined}
+                                    buttonText="ĐĂNG KÝ NGAY"
+                                />
+                            </div>
+                        )}
 
                         <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
                             {post.title}

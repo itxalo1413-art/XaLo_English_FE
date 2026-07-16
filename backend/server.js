@@ -1,4 +1,7 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+// Hosting panel env (cPanel) must win over .env on disk
+dotenv.config({ override: false });
+
 import express from 'express';
 import cors from 'cors';
 import connectDB from './src/config/db.js';
@@ -121,4 +124,7 @@ if (distPath) {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+    console.log(
+        `[email-config] ADMIN_EMAIL=${process.env.ADMIN_EMAIL || '(not set)'} | HR_EMAIL=${process.env.HR_EMAIL || '(not set)'} | SMTP_EMAIL=${process.env.SMTP_EMAIL || '(not set)'}`
+    );
 });

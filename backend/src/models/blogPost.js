@@ -10,6 +10,11 @@ const blogPostSchema = new mongoose.Schema(
     metaTitle: String,
     metaDescription: String,
 
+    // Optional lead form shown near top of the article page
+    showTopLeadForm: { type: Boolean, default: false },
+    topLeadFormTitle: { type: String, default: '' },
+    topLeadFormSubtitle: { type: String, default: '' },
+
     faqs: [
       {
         question: { type: String, required: true },

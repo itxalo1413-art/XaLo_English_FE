@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import client from '../../api/client';
 
-const CTASection = () => {
+const DEFAULT_TITLE = 'CHẨN BỆNH TIẾNG ANH CÙNG XA LỘ ENGLISH ĐỂ ĐẠT MỤC TIÊU NGAY BÂY GIỜ!';
+const DEFAULT_SUBTITLE = 'Chẩn bệnh tiếng Anh cùng Xa Lộ English để đạt được mục tiêu ngay bây giờ!';
+
+const CTASection = ({ title, subtitle, buttonText } = {}) => {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -70,10 +73,10 @@ const CTASection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-2xl md:text-3xl font-bold text-primary-dark uppercase mb-4">
-            CHẨN BỆNH TIẾNG ANH CÙNG XA LỘ ENGLISH ĐỂ ĐẠT MỤC TIÊU NGAY BÂY GIỜ!
+            {title || DEFAULT_TITLE}
           </h2>
           <p className="text-text-secondary">
-            Chẩn bệnh tiếng Anh cùng Xa Lộ English để đạt được mục tiêu ngay bây giờ!
+            {subtitle || DEFAULT_SUBTITLE}
           </p>
         </div>
 
@@ -184,7 +187,7 @@ const CTASection = () => {
                     disabled={loading}
                     className="bg-[#e9a6c5] hover:bg-[#d68baf] text-white font-bold py-3 px-8 rounded-lg shadow-md transition-colors uppercase disabled:opacity-50"
                   >
-                    {loading ? 'Đang gửi...' : 'Đăng ký tư vấn'}
+                    {loading ? 'Đang gửi...' : buttonText || 'Đăng ký tư vấn'}
                   </button>
                 </div>
               </div>
