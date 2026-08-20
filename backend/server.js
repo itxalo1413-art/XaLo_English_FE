@@ -5,8 +5,6 @@ dotenv.config({ override: false });
 import express from 'express';
 import cors from 'cors';
 import connectDB from './src/config/db.js';
-import cron from 'node-cron';
-import { sendLeadSummaryReport } from './src/utils/leadReportService.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
@@ -29,11 +27,6 @@ import { getSitemap, getRobots } from './src/controllers/seoController.js';
 import { createPrerenderMiddleware } from './src/middleware/prerenderMiddleware.js';
 
 connectDB();
-
-// --- Lập lịch gửi báo cáo (Giữ nguyên từ bản mới nhất của bạn) ---
-cron.schedule('0 9 * * *', () => { sendLeadSummaryReport('9h sáng', 13); }, { timezone: "Asia/Ho_Chi_Minh" });
-cron.schedule('0 15 * * *', () => { sendLeadSummaryReport('15h chiều', 6); }, { timezone: "Asia/Ho_Chi_Minh" });
-cron.schedule('0 20 * * *', () => { sendLeadSummaryReport('20h tối', 5); }, { timezone: "Asia/Ho_Chi_Minh" });
 
 const app = express();
 

@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import Lead from '../models/leadModel.js';
 import appendLeadToSheet from '../utils/googleSheets.js';
+import { sendLeadNotification } from '../utils/leadReportService.js';
 
 // @desc    Create a new lead
 // @route   POST /api/v1/leads
@@ -24,6 +25,13 @@ const createLead = asyncHandler(async (req, res) => {
         await appendLeadToSheet(createdLead);
     } catch (error) {
         console.error('Google Sheets logging failed:', error.message);
+    }
+
+    // Send immediate email notification
+    try {
+        await sendLeadNotification(createdLead);
+    } catch (error) {
+        console.error('Lead notification email failed:', error.message);
     }
 
     res.status(201).json(createdLead);
